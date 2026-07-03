@@ -1,0 +1,134 @@
+// ============================================
+// Clothing Shop DB Schema
+// ============================================
+
+Table categories {
+  id int [pk, increment]
+  name varchar
+  parent_id int [ref: > categories.id]
+  created_at timestamp [default: `now()`]
+}
+
+Table products {
+  id int [pk, increment]
+  name varchar
+  description text
+  brand varchar
+  base_price decimal
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+}
+
+// many-to-many, a product can sit in multiple categories
+Table product_categories {
+  product_id int [ref: > products.id]
+  category_id int [ref: > categories.id]
+
+  indexes {
+    (product_id, category_id) [pk]
+  }
+}
+
+Table tags {
+  id int [pk, increment]
+  name varchar [unique]
+}
+
+Table product_tags {
+  product_id int [ref: > products.id]
+  tag_id int [ref: > tags.id]
+
+  indexes {
+    (product_id, tag_id) [pk]
+  }
+}
+
+// this is where size/color/stock lives, not on products
+Table product_variants {
+  id int [pk, increment]
+  product_id int [ref: > products.id]
+  sku varchar [unique]
+  price decimal
+  stock_qty int [default: 0]
+  attributes json // {"size":"M","color":"red"}
+  image_url varchar
+  created_at timestamp [default: `now()`]
+}
+
+Table customers {
+  id int [pk, increment]
+  name varchar
+  email varchar [unique]
+  password_hash varchar
+  created_at timestamp [default: `now()`]
+}
+
+Table addresses {
+  id int [pk, increment]
+  customer_id int [ref: > customers.id]
+  line1 varchar
+  city varchar
+  country varchar
+  is_default boolean [default: false]
+}
+
+Table carts {
+  id int [pk, increment]
+  customer_id int [ref: > customers.id, null]
+  session_id varchar [null]
+  created_at timestamp [default: `now()`]
+}
+
+Table cart_items {
+  id int [pk, increment]
+  cart_id int [ref: > carts.id]
+  variant_id int [ref: > product_variants.id]
+  quantity int
+}
+
+Table orders {
+  id int [pk, increment]
+  customer_id int [ref: > customers.id]
+  status varchar // pending, paid, shipped, cancelled
+  total decimal
+  created_at timestamp [default: `now()`]
+}
+
+// price is copied here so it never changes after purchase
+Table order_items {
+  id int [pk, increment]
+  order_id int [ref: > orders.id]
+  variant_id int [ref: > product_variants.id]
+  quantity int
+  price_at_purchase decimal
+}
+
+Table discounts {
+  id int [pk, increment]
+  code varchar [unique]
+  type varchar // percentage, fixed
+  value decimal
+  min_order_amount decimal [null]
+  usage_limit int [null]
+  times_used int [default: 0]
+  starts_at timestamp [null]
+  expires_at timestamp [null]
+  is_active boolean [default: true]
+}
+
+// tracks who used what code, prevents reuse abuse
+Table discount_usage {
+  id int [pk, increment]
+  discount_id int [ref: > discounts.id]
+  customer_id int [ref: > customers.id]
+  order_id int [ref: > orders.id]
+  used_at timestamp [default: `now()`]
+}
+
+// what discount actually got applied to an order, and how much it saved
+Table order_discounts {
+  id int [pk, increment]
+  order_id int [ref: > orders.id]
+  discount_id int [ref: > discounts.id]
+  amount_saved decimal
+}

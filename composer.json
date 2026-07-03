@@ -1,0 +1,8 @@
+{
+    "name": "yourname/shop-project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
