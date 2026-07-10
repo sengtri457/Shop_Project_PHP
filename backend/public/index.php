@@ -14,6 +14,7 @@ use App\Controllers\OrderController;
 use App\Controllers\AddressController;
 use App\Controllers\CustomerController;
 use App\Controllers\TagController;
+use App\Controllers\DiscountController;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -76,6 +77,15 @@ $router->delete('/addresses/{id}',[AddressController::class, 'destroy']);
 $router->get('/tags',      [TagController::class, 'index']);
 $router->get('/tags/{id}', [TagController::class, 'show']);
 $router->post('/tags',     [TagController::class, 'store']);
+
+// ---- Discounts ----
+$router->get('/discounts',             [DiscountController::class, 'index']);
+$router->get('/discounts/{id}',        [DiscountController::class, 'show']);
+$router->post('/discounts',            [DiscountController::class, 'store']);
+$router->put('/discounts/{id}',        [DiscountController::class, 'update']);
+$router->patch('/discounts/{id}',      [DiscountController::class, 'update']);
+$router->delete('/discounts/{id}',     [DiscountController::class, 'destroy']);
+$router->post('/discounts/validate',   [DiscountController::class, 'validateCode']);
 
 $uri   = $_SERVER['REQUEST_URI'];
 $uri   = parse_url($uri, PHP_URL_PATH);

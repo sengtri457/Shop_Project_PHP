@@ -69,4 +69,74 @@ class Discount
         $stmt = $db->prepare("UPDATE discounts SET times_used = times_used + 1 WHERE id = ?");
         $stmt->execute([$discountId]);
     }
+
+    public static function all(): array
+    {
+        $db = Database::getConnection();
+        $stmt = $db->query("SELECT * FROM discounts ORDER BY id DESC");
+        return $stmt->fetchAll();
+    }
+
+    public static function find(int $id): ?array
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare("SELECT * FROM discounts WHERE id = ?");
+        $stmt->execute([$id]);
+        $discount = $stmt->fetch();
+
+        return $discount ?: null;
+    }
+
+    public static function create(array $data): int
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare("
+            INSERT INTO discounts (
+                code, type, value, min_order_amount, usage_limit, starts_at, expires_at, is_active
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $data['code'],
+            $data['type'] ?? 'fixed',
+            $data['value'],
+            $data['min_order_amount'] ?? null,
+            $data['usage_limit'] ?? null,
+            $data['starts_at'] ?? null,
+            $data['expires_at'] ?? null,
+            isset($data['is_active']) ? (int) $data['is_active'] : 1,
+        ]);
+
+        return (int) $db->lastInsertId();
+    }
+
+    public static function update(int $id, array $data): void
+    {
+        $db = Database::getConnection();
+        $fields = [];
+        $params = [];
+
+        $allowedFields = ['code', 'type', 'value', 'min_order_amount', 'usage_limit', 'starts_at', 'expires_at', 'is_active'];
+        foreach ($allowedFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $fields[] = "$field = ?";
+                $params[] = $data[$field];
+            }
+        }
+
+        if (empty($fields)) {
+            return;
+        }
+
+        $params[] = $id;
+        $sql = "UPDATE discounts SET " . implode(', ', $fields) . " WHERE id = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+    }
+
+    public static function delete(int $id): void
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare("DELETE FROM discounts WHERE id = ?");
+        $stmt->execute([$id]);
+    }
 }

@@ -38,6 +38,10 @@ class AuthController
 
         $id = Customer::create($name, $email, $password);
 
+        if (!empty($body['session_id'])) {
+            \App\Models\Cart::mergeGuestCart($body['session_id'], $id);
+        }
+
         $token = JWT::encode(['customer_id' => $id, 'email' => $email]);
 
         Response::json([
@@ -59,6 +63,10 @@ class AuthController
         if (!$customer) {
             Response::error('Invalid email or password', 401);
             return;
+        }
+
+        if (!empty($body['session_id'])) {
+            \App\Models\Cart::mergeGuestCart($body['session_id'], (int) $customer['id']);
         }
 
         $token = JWT::encode([

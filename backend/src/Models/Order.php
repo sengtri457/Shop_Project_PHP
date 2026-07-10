@@ -11,10 +11,21 @@ class Order
         $db = Database::getConnection();
 
         if ($customerId) {
-            $stmt = $db->prepare("SELECT * FROM orders WHERE customer_id = ? ORDER BY created_at DESC");
+            $stmt = $db->prepare("
+                SELECT o.*, c.name as customer_name 
+                FROM orders o
+                JOIN customers c ON o.customer_id = c.id
+                WHERE o.customer_id = ? 
+                ORDER BY o.created_at DESC
+            ");
             $stmt->execute([$customerId]);
         } else {
-            $stmt = $db->query("SELECT * FROM orders ORDER BY created_at DESC");
+            $stmt = $db->query("
+                SELECT o.*, c.name as customer_name 
+                FROM orders o
+                JOIN customers c ON o.customer_id = c.id
+                ORDER BY o.created_at DESC
+            ");
         }
 
         return $stmt->fetchAll();
@@ -23,7 +34,12 @@ class Order
     public static function find(int $id): ?array
     {
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT * FROM orders WHERE id = ?");
+        $stmt = $db->prepare("
+            SELECT o.*, c.name as customer_name 
+            FROM orders o
+            JOIN customers c ON o.customer_id = c.id
+            WHERE o.id = ?
+        ");
         $stmt->execute([$id]);
         $order = $stmt->fetch();
 
@@ -59,12 +75,17 @@ class Order
         return $stmt->fetchAll();
     }
 
-    public static function create(int $customerId, array $items, ?array $discountData = null): int
+    public static function create(int $customerId, array $items, int $addressId, ?array $discountData = null): int
     {
         $db = Database::getConnection();
         $db->beginTransaction();
 
         try {
+            $address = Address::find($addressId);
+            if (!$address || (int) $address['customer_id'] !== $customerId) {
+                throw new \RuntimeException("Invalid shipping address selected");
+            }
+
             $total = 0;
             $orderItems = [];
 
@@ -104,8 +125,23 @@ class Order
                 $total -= $discountAmount;
             }
 
-            $stmt = $db->prepare("INSERT INTO orders (customer_id, status, total) VALUES (?, 'pending', ?)");
-            $stmt->execute([$customerId, $total]);
+            $stmt = $db->prepare("
+                INSERT INTO orders (
+                    customer_id, status, total,
+                    shipping_line1, shipping_line2, shipping_city,
+                    shipping_postal_code, shipping_country, shipping_phone
+                ) VALUES (?, 'pending', ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->execute([
+                $customerId,
+                $total,
+                $address['line1'],
+                $address['line2'] ?? null,
+                $address['city'],
+                $address['postal_code'] ?? null,
+                $address['country'],
+                $address['phone'] ?? null
+            ]);
             $orderId = (int) $db->lastInsertId();
 
             $stmt = $db->prepare("

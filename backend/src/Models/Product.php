@@ -148,14 +148,16 @@ class Product
     {
         $db = Database::getConnection();
         $stmt = $db->prepare("
-            INSERT INTO products (name, description, brand, base_price, is_active)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO products (name, description, brand, base_price, discount_percent, images, is_active)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
             $data['name'],
             $data['description'] ?? null,
             $data['brand'] ?? null,
             $data['base_price'],
+            $data['discount_percent'] ?? 0,
+            $data['images'] ?? null,
             $data['is_active'] ?? 1,
         ]);
 
@@ -168,7 +170,7 @@ class Product
         $fields = [];
         $params = [];
 
-        foreach (['name', 'description', 'brand', 'base_price', 'is_active'] as $field) {
+        foreach (['name', 'description', 'brand', 'base_price', 'discount_percent', 'images', 'is_active'] as $field) {
             if (array_key_exists($field, $data)) {
                 $fields[] = "$field = ?";
                 $params[] = $data[$field];

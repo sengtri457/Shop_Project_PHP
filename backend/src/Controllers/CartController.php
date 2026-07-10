@@ -11,7 +11,7 @@ class CartController
     {
         $body = json_decode(file_get_contents('php://input'), true) ?? [];
 
-        $customerId = $body['customer_id'] ?? $_GET['customer_id'] ?? null;
+        $customerId = \App\Core\Auth::id() ?? $body['customer_id'] ?? $_GET['customer_id'] ?? null;
         $sessionId  = $body['session_id'] ?? $_GET['session_id'] ?? null;
 
         if (!$customerId && !$sessionId) {

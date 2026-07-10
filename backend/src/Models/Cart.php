@@ -82,4 +82,66 @@ class Cart
         $stmt = $db->prepare("UPDATE cart_items SET quantity = ? WHERE cart_id = ? AND id = ?");
         $stmt->execute([$quantity, $cartId, $itemId]);
     }
+
+    public static function mergeGuestCart(?string $sessionId, int $customerId): void
+    {
+        if (empty($sessionId)) {
+            return;
+        }
+
+        $db = Database::getConnection();
+
+        // 1. Find guest cart
+        $stmt = $db->prepare("SELECT id FROM carts WHERE session_id = ?");
+        $stmt->execute([$sessionId]);
+        $guestCart = $stmt->fetch();
+
+        if (!$guestCart) {
+            return; // No guest cart to merge
+        }
+
+        $guestCartId = (int) $guestCart['id'];
+
+        // 2. Find customer cart
+        $stmt = $db->prepare("SELECT id FROM carts WHERE customer_id = ?");
+        $stmt->execute([$customerId]);
+        $customerCart = $stmt->fetch();
+
+        if (!$customerCart) {
+            // Customer doesn't have a cart yet: simple assign guest cart to customer
+            $stmt = $db->prepare("UPDATE carts SET customer_id = ?, session_id = NULL WHERE id = ?");
+            $stmt->execute([$customerId, $guestCartId]);
+            return;
+        }
+
+        $customerCartId = (int) $customerCart['id'];
+
+        // 3. Customer cart exists: merge items
+        $stmt = $db->prepare("SELECT variant_id, quantity FROM cart_items WHERE cart_id = ?");
+        $stmt->execute([$guestCartId]);
+        $guestItems = $stmt->fetchAll();
+
+        foreach ($guestItems as $item) {
+            $variantId = (int) $item['variant_id'];
+            $quantity = (int) $item['quantity'];
+
+            // Check if item exists in customer cart
+            $checkStmt = $db->prepare("SELECT id, quantity FROM cart_items WHERE cart_id = ? AND variant_id = ?");
+            $checkStmt->execute([$customerCartId, $variantId]);
+            $existing = $checkStmt->fetch();
+
+            if ($existing) {
+                $newQty = $existing['quantity'] + $quantity;
+                $updateStmt = $db->prepare("UPDATE cart_items SET quantity = ? WHERE id = ?");
+                $updateStmt->execute([$newQty, $existing['id']]);
+            } else {
+                $insertStmt = $db->prepare("INSERT INTO cart_items (cart_id, variant_id, quantity) VALUES (?, ?, ?)");
+                $insertStmt->execute([$customerCartId, $variantId, $quantity]);
+            }
+        }
+
+        // 4. Delete the guest cart (cascade delete removes guest items)
+        $stmt = $db->prepare("DELETE FROM carts WHERE id = ?");
+        $stmt->execute([$guestCartId]);
+    }
 }

@@ -30,13 +30,15 @@ CREATE TABLE categories (
 -- Products
 -- -------------------------------------------
 CREATE TABLE products (
-  id          INT           AUTO_INCREMENT PRIMARY KEY,
-  name        VARCHAR(255)  NOT NULL,
-  description TEXT          NULL,
-  brand       VARCHAR(255)  NULL,
-  base_price  DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-  is_active   TINYINT(1)    NOT NULL DEFAULT 1,
-  created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  id               INT           AUTO_INCREMENT PRIMARY KEY,
+  name             VARCHAR(255)  NOT NULL,
+  description      TEXT          NULL,
+  brand            VARCHAR(255)  NULL,
+  base_price       DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  discount_percent INT           NOT NULL DEFAULT 0,
+  images           TEXT          NULL,
+  is_active        TINYINT(1)    NOT NULL DEFAULT 1,
+  created_at       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   INDEX idx_is_active (is_active),
   INDEX idx_brand (brand)
@@ -187,8 +189,14 @@ CREATE TABLE orders (
   id          INT           AUTO_INCREMENT PRIMARY KEY,
   customer_id INT           NOT NULL,
   status      VARCHAR(50)   NOT NULL DEFAULT 'pending',
-  total       DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-  created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  total                DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  shipping_line1       VARCHAR(255)  NOT NULL,
+  shipping_line2       VARCHAR(255)  NULL,
+  shipping_city        VARCHAR(100)  NOT NULL,
+  shipping_postal_code VARCHAR(20)   NULL,
+  shipping_country     VARCHAR(100)  NOT NULL,
+  shipping_phone       VARCHAR(30)   NULL,
+  created_at           TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   FOREIGN KEY (customer_id) REFERENCES customers(id)
     ON DELETE CASCADE
