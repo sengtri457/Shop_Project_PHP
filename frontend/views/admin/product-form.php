@@ -45,6 +45,15 @@ $isEdit = $product !== null;
                 Discount Percentage (%)
                 <input type="number" name="discount_percent" min="0" max="100" value="<?= $product['discount_percent'] ?? 0 ?>" required style="padding: 10px 14px; border: 1px solid var(--color-gray-light); border-radius: var(--border-radius); outline: none;">
             </label>
+            <label style="flex: 1; display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 13px;">
+                Gender Section
+                <select name="gender" style="padding: 10px 14px; border: 1px solid var(--color-gray-light); border-radius: var(--border-radius); outline: none; background: #fff; color: var(--color-dark);">
+                    <option value="unisex" <?= ($product['gender'] ?? '') === 'unisex' ? 'selected' : '' ?>>Unisex</option>
+                    <option value="men" <?= ($product['gender'] ?? '') === 'men' ? 'selected' : '' ?>>Men</option>
+                    <option value="women" <?= ($product['gender'] ?? '') === 'women' ? 'selected' : '' ?>>Women</option>
+                    <option value="kids" <?= ($product['gender'] ?? '') === 'kids' ? 'selected' : '' ?>>Kids</option>
+                </select>
+            </label>
         </div>
 
         <label style="display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 13px;">

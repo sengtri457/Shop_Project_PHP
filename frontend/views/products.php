@@ -8,6 +8,8 @@ $search = $_GET['search'] ?? '';
 $minPrice = $_GET['min_price'] ?? '';
 $maxPrice = $_GET['max_price'] ?? '';
 
+$gender = $_GET['gender'] ?? '';
+
 $query = http_build_query(array_filter([
     'page' => $page,
     'limit' => $limit,
@@ -17,6 +19,7 @@ $query = http_build_query(array_filter([
     'search' => $search ?: null,
     'min_price' => $minPrice ?: null,
     'max_price' => $maxPrice ?: null,
+    'gender' => $gender ?: null,
 ]));
 
 $result = api_get("/products?$query");
@@ -31,6 +34,14 @@ $categories = $cats['data'] ?? [];
 
     <form class="filters" method="GET" style="display: flex; gap: 12px; flex-wrap: wrap; background: #fafafa; border: 1px solid var(--color-gray-light); padding: 16px; border-radius: var(--border-radius); margin-bottom: 40px; align-items: center;">
         <input type="search" name="search" placeholder="Search products..." value="<?= htmlspecialchars($search) ?>" style="flex: 1; min-width: 200px; padding: 10px 14px; border: 1px solid var(--color-gray-light); border-radius: var(--border-radius); outline: none;">
+
+        <select name="gender" style="padding: 10px 14px; border: 1px solid var(--color-gray-light); border-radius: var(--border-radius); outline: none; background: #fff; color: var(--color-dark);">
+            <option value="">All Sections</option>
+            <option value="unisex" <?= $gender === 'unisex' ? 'selected' : '' ?>>Unisex</option>
+            <option value="men" <?= $gender === 'men' ? 'selected' : '' ?>>Men</option>
+            <option value="women" <?= $gender === 'women' ? 'selected' : '' ?>>Women</option>
+            <option value="kids" <?= $gender === 'kids' ? 'selected' : '' ?>>Kids</option>
+        </select>
 
         <select name="category_id" style="padding: 10px 14px; border: 1px solid var(--color-gray-light); border-radius: var(--border-radius); outline: none; background: #fff; color: var(--color-dark);">
             <option value="">All Categories</option>

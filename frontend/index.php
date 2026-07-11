@@ -1,6 +1,12 @@
 <?php
 
+// Route static files directly when using the PHP built-in server
+if (php_sapi_name() === 'cli-server' && is_file(__DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH))) {
+    return false;
+}
+
 session_start();
+
 
 require_once __DIR__ . '/helpers.php';
 
@@ -303,6 +309,7 @@ function handle_admin_product_store(): void
         'name' => $_POST['name'] ?? '',
         'description' => $_POST['description'] ?? '',
         'brand' => $_POST['brand'] ?? '',
+        'gender' => $_POST['gender'] ?? 'unisex',
         'base_price' => (float) ($_POST['base_price'] ?? 0),
         'discount_percent' => (int) ($_POST['discount_percent'] ?? 0),
         'images' => trim($_POST['images'] ?? ''),
@@ -355,6 +362,7 @@ function handle_admin_product_update(int $id): void
         'name' => $_POST['name'] ?? '',
         'description' => $_POST['description'] ?? '',
         'brand' => $_POST['brand'] ?? '',
+        'gender' => $_POST['gender'] ?? 'unisex',
         'base_price' => (float) ($_POST['base_price'] ?? 0),
         'discount_percent' => (int) ($_POST['discount_percent'] ?? 0),
         'images' => trim($_POST['images'] ?? ''),

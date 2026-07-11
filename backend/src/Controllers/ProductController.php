@@ -21,7 +21,8 @@ class ProductController
             sortBy: $_GET['sort_by'] ?? 'created_at',
             sortOrder: $_GET['sort_order'] ?? 'desc',
             page: max(1, (int) ($_GET['page'] ?? 1)),
-            limit: min(100, max(1, (int) ($_GET['limit'] ?? 20)))
+            limit: min(100, max(1, (int) ($_GET['limit'] ?? 20))),
+            gender: $_GET['gender'] ?? null
         );
 
         $result['data'] = array_map(function ($product) {

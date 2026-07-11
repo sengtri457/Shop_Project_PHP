@@ -85,7 +85,14 @@ function is_admin(): bool
 
 function redirect(string $path): void
 {
-    header("Location: $path");
+    if (!headers_sent()) {
+        header("Location: $path");
+        exit;
+    }
+    
+    // Fallback if headers are already sent
+    echo '<script type="text/javascript">window.location.href = ' . json_encode($path) . ';</script>';
+    echo '<noscript><meta http-equiv="refresh" content="0;url=' . htmlspecialchars($path) . '"></noscript>';
     exit;
 }
 

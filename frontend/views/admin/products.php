@@ -21,6 +21,7 @@ $products = $result['data']['data'] ?? [];
                     <th style="padding: 16px 20px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-gray-dark); text-align: left; font-weight: 600;">Name</th>
                     <th style="padding: 16px 20px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-gray-dark); text-align: left; font-weight: 600;">Price</th>
                     <th style="padding: 16px 20px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-gray-dark); text-align: left; font-weight: 600;">Brand</th>
+                    <th style="padding: 16px 20px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-gray-dark); text-align: left; font-weight: 600;">Gender</th>
                     <th style="padding: 16px 20px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-gray-dark); text-align: left; font-weight: 600; width: 180px;">Actions</th>
                 </tr>
             </thead>
@@ -31,6 +32,7 @@ $products = $result['data']['data'] ?? [];
                         <td style="padding: 14px 20px; font-size: 14px; color: var(--color-black); font-weight: 600;"><?= htmlspecialchars($p['name']) ?></td>
                         <td style="padding: 14px 20px; font-size: 14px; color: var(--color-dark);">$<?= number_format($p['base_price'], 2) ?></td>
                         <td style="padding: 14px 20px; font-size: 14px; color: var(--color-gray-dark);"><?= htmlspecialchars($p['brand'] ?? '—') ?></td>
+                        <td style="padding: 14px 20px; font-size: 14px; color: var(--color-gray-dark);"><span class="badge badge-pending" style="text-transform: capitalize;"><?= htmlspecialchars($p['gender'] ?? 'unisex') ?></span></td>
                         <td style="padding: 14px 20px; display: flex; gap: 8px;">
                             <a href="/admin/products/<?= $p['id'] ?>/edit" class="btn btn-small" style="padding: 6px 12px; font-size: 11px;">Edit</a>
                             <a href="/admin/products?delete=<?= $p['id'] ?>" class="btn btn-small btn-danger"

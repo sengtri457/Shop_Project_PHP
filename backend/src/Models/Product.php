@@ -18,7 +18,8 @@ class Product
         string $sortBy = 'created_at',
         string $sortOrder = 'desc',
         int $page = 1,
-        int $limit = 20
+        int $limit = 20,
+        ?string $gender = null
     ): array {
         $db = Database::getConnection();
 
@@ -73,6 +74,11 @@ class Product
                 SELECT pt.product_id FROM product_tags pt WHERE pt.tag_id IN ($placeholders)
             )";
             $params = array_merge($params, $tagIds);
+        }
+
+        if ($gender) {
+            $where .= " AND p.gender = ?";
+            $params[] = $gender;
         }
 
         $countStmt = $db->prepare("SELECT COUNT(*) FROM products p $where");
@@ -148,13 +154,14 @@ class Product
     {
         $db = Database::getConnection();
         $stmt = $db->prepare("
-            INSERT INTO products (name, description, brand, base_price, discount_percent, images, is_active)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO products (name, description, brand, gender, base_price, discount_percent, images, is_active)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
             $data['name'],
             $data['description'] ?? null,
             $data['brand'] ?? null,
+            $data['gender'] ?? 'unisex',
             $data['base_price'],
             $data['discount_percent'] ?? 0,
             $data['images'] ?? null,
@@ -170,7 +177,7 @@ class Product
         $fields = [];
         $params = [];
 
-        foreach (['name', 'description', 'brand', 'base_price', 'discount_percent', 'images', 'is_active'] as $field) {
+        foreach (['name', 'description', 'brand', 'gender', 'base_price', 'discount_percent', 'images', 'is_active'] as $field) {
             if (array_key_exists($field, $data)) {
                 $fields[] = "$field = ?";
                 $params[] = $data[$field];
