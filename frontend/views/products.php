@@ -29,8 +29,41 @@ $cats = api_get('/categories');
 $categories = $cats['data'] ?? [];
 ?>
 
+<?php
+// Dynamic Banner Configuration
+$bannerTitle = 'All Products';
+$bannerSubtitle = 'Discover our curated selection of high-quality essentials.';
+$bannerImage = '/assets/images/hero_banner.png';
+
+if ($gender === 'men') {
+    $bannerTitle = "Men's Collection";
+    $bannerSubtitle = "Engineered for durability and modern style.";
+    $bannerImage = '/assets/images/bannerMen.gif';
+} elseif ($gender === 'women') {
+    $bannerTitle = "Women's Collection";
+    $bannerSubtitle = "Premium fabrics and clean, elegant silhouettes.";
+    $bannerImage = '/assets/images/BannerWomen.avif';
+} elseif ($gender === 'kids') {
+    $bannerTitle = "Kids' Collection";
+    $bannerSubtitle = "Comfortable, playful styles designed for movement.";
+    $bannerImage = '/assets/images/hero_banner.png'; 
+}
+?>
+
 <div class="section">
-    <h1 style="margin-bottom: 30px; font-family: var(--font-serif); font-weight: 500;">All Products</h1>
+    <!-- Premium Section Top Banner -->
+    <div class="w-full aspect-[21/6] md:aspect-[21/5] max-h-[340px] overflow-hidden rounded-brand relative mb-12 border border-brand-border">
+        <!-- Dark gradient overlay -->
+        <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent z-10"></div>
+        <img src="<?= asset_url($bannerImage) ?>" class="w-full h-full object-cover" alt="<?= htmlspecialchars($bannerTitle) ?>">
+        <div class="absolute inset-0 flex flex-col justify-center px-8 md:px-14 z-20">
+            <div class="max-w-md page-fade">
+                <span class="text-[10px] font-bold tracking-widest text-[#fee8e6] uppercase block mb-1.5">Collection Category</span>
+                <h1 class="font-serif text-[1.75rem] md:text-[2.25rem] font-medium text-white leading-tight mb-2"><?= htmlspecialchars($bannerTitle) ?></h1>
+                <p class="text-[12px] text-white/80 leading-relaxed max-w-sm"><?= htmlspecialchars($bannerSubtitle) ?></p>
+            </div>
+        </div>
+    </div>
 
     <form class="filters" method="GET" style="display: flex; gap: 12px; flex-wrap: wrap; background: #fafafa; border: 1px solid var(--color-gray-light); padding: 16px; border-radius: var(--border-radius); margin-bottom: 40px; align-items: center;">
         <input type="search" name="search" placeholder="Search products..." value="<?= htmlspecialchars($search) ?>" style="flex: 1; min-width: 200px; padding: 10px 14px; border: 1px solid var(--color-gray-light); border-radius: var(--border-radius); outline: none;">
@@ -74,10 +107,7 @@ $categories = $cats['data'] ?? [];
     <?php else: ?>
         <div class="product-grid">
             <?php foreach ($products as $product):
-                $prodImages = [];
-                if (!empty($product['images'])) {
-                    $prodImages = array_filter(array_map('trim', explode(',', $product['images'])));
-                }
+                $prodImages = split_image_urls($product['images'] ?? '');
                 if (empty($prodImages) && !empty($product['variants'])) {
                     foreach ($product['variants'] as $v) {
                         if (!empty($v['image_url'])) {
@@ -86,7 +116,7 @@ $categories = $cats['data'] ?? [];
                         }
                     }
                 }
-                $mainImg = !empty($prodImages) ? $prodImages[0] : '/assets/images/hero_banner.png';
+                $mainImg = !empty($prodImages) ? asset_url($prodImages[0]) : '/assets/images/hero_banner.png';
                 $discountPercent = (int) ($product['discount_percent'] ?? 0);
             ?>
                 <a href="/products/<?= $product['id'] ?>" class="product-card">

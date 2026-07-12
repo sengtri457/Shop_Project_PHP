@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     
     <!-- Tailwind CSS Play CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,7 +19,7 @@
             window.addEventListener('DOMContentLoaded', () => {
                 const diag = document.createElement('div');
                 diag.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#9e2a2b;color:#fff;text-align:center;padding:16px;z-index:99999;font-weight:600;font-family:sans-serif;box-shadow:0 4px 12px rgba(0,0,0,0.15);';
-                diag.innerHTML = '⚠️ Tailwind CSS CDN failed to load. The page layouts will appear unstyled. Please check your internet connection or browser console (F12) for network/CSP blocks.';
+                diag.innerHTML = 'Tailwind CSS CDN failed to load. The page layouts will appear unstyled. Please check your internet connection or browser console (F12) for network/CSP blocks.';
                 document.body.insertBefore(diag, document.body.firstChild);
             });
         }
@@ -57,6 +58,8 @@
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body class="bg-brand-bg text-brand-text font-sans antialiased">
+    <!-- Top Progress Loading Bar -->
+    <div id="topLoadingBar" class="fixed top-0 left-0 h-[3.5px] bg-brand-accent z-[10000] w-0 transition-all duration-200 pointer-events-none opacity-0"></div>
     <?php
     $currentUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $currentUri = rtrim($currentUri, '/') ?: '/';
@@ -67,9 +70,15 @@
         return '';
     }
     ?>
+    <?php 
+    $isAdminRoute = is_admin() && (strpos($currentUri, '/admin') === 0);
+    if (!$isAdminRoute): 
+    ?>
     <nav class="sticky top-0 z-50 bg-brand-bg/95 backdrop-blur-md border-b border-brand-border py-6 transition-all duration-300">
-        <div class="max-w-[1280px] mx-auto px-8 flex justify-between items-center static">
-            <a href="/" class="font-serif text-[1.8rem] font-semibold tracking-tighter text-brand-text">ClothesByKTRI</a>
+        <div class="max-w-[1280px] mx-auto px-8 flex justify-around items-center static">
+            <a href="/" class="flex items-center">
+                <img src="/assets/images/logoDevs.png" alt="Logo" class="h-10 w-auto">
+            </a>
             
             <div class="hidden md:flex items-center gap-8">
                 <a href="/" class="text-[12px] font-medium tracking-widest uppercase text-brand-muted hover:text-brand-text py-1.5 relative <?= isActive('/', $currentUri) === 'active' ? 'text-brand-text after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-brand-accent' : '' ?>">Home</a>
@@ -179,7 +188,10 @@
                     </div>
                 </div>
                 <!-- SEARCH PILL -->
-                <form action="/products" method="GET" class="relative hidden lg:flex items-center">
+               
+                </div>
+                        <div class="flex items-center gap-6">
+                 <form action="/products" method="GET" class="relative hidden lg:flex items-center">
                     <input type="text" name="search" placeholder="Search" 
                            value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" 
                            class="bg-brand-darker text-[12px] font-sans text-brand-text placeholder-brand-muted pl-10 pr-4 py-2 w-40 focus:w-56 rounded-full transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-brand-accent focus:bg-white border border-transparent focus:border-brand-border">
@@ -189,6 +201,11 @@
                         </svg>
                     </div>
                 </form>
+
+                <a href="/favorites" class="text-[12px] font-medium tracking-widest uppercase text-brand-muted hover:text-brand-text py-1.5 relative <?= strpos($currentUri, '/favorites') === 0 ? 'text-brand-text after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-brand-accent' : '' ?> flex items-center gap-1">
+                    <span>Favorites</span>
+                    <span id="fav-badge-count" class="hidden text-[9px] font-bold bg-brand-accent text-white px-1.5 py-0.5 rounded-full leading-none">0</span>
+                </a>
 
                 <a href="/cart" class="text-[12px] font-medium tracking-widest uppercase text-brand-muted hover:text-brand-text py-1.5 relative <?= isActive('/cart', $currentUri) === 'active' ? 'text-brand-text after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-brand-accent' : '' ?>">Cart</a>
                 
@@ -219,7 +236,7 @@
                             <a href="/register" class="block px-4 py-1.5 text-[12px] tracking-wide text-brand-muted hover:text-brand-text hover:bg-brand-darker transition-colors">Register</a>
                         <?php endif; ?>
                     </div>
-                </div>
+            </div>
             </div>
 
             <button class="md:hidden flex flex-col gap-1.5 p-1 bg-transparent border-none cursor-pointer" onclick="toggleMobileNav()" aria-label="Toggle navigation">
@@ -227,6 +244,7 @@
                 <span class="block w-6 h-[1.5px] bg-brand-text transition-all duration-300"></span>
                 <span class="block w-6 h-[1.5px] bg-brand-text transition-all duration-300"></span>
             </button>
+            
         </div>
 
         <div class="hidden flex-col absolute top-[79px] left-0 w-full bg-brand-bg border-b border-brand-border p-6 gap-4 z-[99] shadow-md [&.active]:flex" id="mobileNavMenu">
@@ -262,6 +280,7 @@
             <?php endif; ?>
         </div>
     </nav>
+    <?php endif; ?>
 
     <script>
     function toggleMobileNav() {
@@ -292,4 +311,120 @@
     }
     </script>
 
-    <main class="max-w-[1280px] mx-auto px-8 pt-12 pb-24 min-h-[calc(100vh-200px)]">
+    <main class="max-w-[1280px] mx-auto px-8 pt-8 pb-24 min-h-[calc(100vh-200px)]">
+    <?php if ($isAdminRoute): ?>
+        <!-- Mobile Admin Top Bar Header -->
+        <div class="lg:hidden w-full bg-brand-darker border-b border-brand-border py-4 px-6 flex justify-between items-center sticky top-0 z-[100]">
+            <a href="/" class="flex items-center">
+                <img src="/assets/images/Logo.png" alt="Logo" class="h-8 w-auto object-contain">
+            </a>
+            <button onclick="toggleAdminSidebar()" class="p-2 text-brand-text hover:bg-brand-border/40 rounded transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Sidebar Overlay Backdrop for Mobile -->
+        <div id="adminSidebarOverlay" onclick="toggleAdminSidebar()" class="fixed inset-0 bg-black/45 z-[98] hidden transition-opacity duration-300 opacity-0"></div>
+
+        <!-- Sidebar Container -->
+        <div id="adminSidebar" class="w-[260px] fixed top-0 left-0 h-screen bg-brand-darker border-r border-brand-border p-6 z-[99] overflow-y-auto -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+            <!-- Admin Info -->
+            <div class="mb-6 p-4 bg-brand-bg border border-brand-border rounded-brand text-center">
+                <span class="text-[10px] font-bold tracking-wider uppercase text-brand-accent block mb-1">Administrator</span>
+                <div class="font-serif text-[15px] font-semibold text-brand-text truncate"><?= htmlspecialchars($_SESSION['customer']['name'] ?? 'Admin') ?></div>
+                <div class="text-[11px] text-brand-muted truncate mt-0.5"><?= htmlspecialchars($_SESSION['customer']['email'] ?? '') ?></div>
+            </div>
+            
+            <h3 class="font-serif text-[1.25rem] font-semibold text-brand-text mb-4 pb-2 border-b border-brand-border">Admin Console</h3>
+            <nav class="flex flex-col gap-1.5">
+                <a href="/admin" class="flex items-center gap-3 px-4 py-3.5 rounded-brand text-[13px] font-semibold transition-all duration-300 <?= $currentUri === '/admin' ? 'bg-brand-text text-brand-bg' : 'text-brand-muted hover:text-brand-text hover:bg-brand-border/40' ?>" onclick="closeAdminSidebarOnMobile()">
+                    <svg class="w-4 h-4 stroke-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="/admin/products" class="flex items-center gap-3 px-4 py-3.5 rounded-brand text-[13px] font-semibold transition-all duration-300 <?= strpos($currentUri, '/admin/products') === 0 ? 'bg-brand-text text-brand-bg' : 'text-brand-muted hover:text-brand-text hover:bg-brand-border/40' ?>" onclick="closeAdminSidebarOnMobile()">
+                    <svg class="w-4 h-4 stroke-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    Products
+                </a>
+                <a href="/admin/categories" class="flex items-center gap-3 px-4 py-3.5 rounded-brand text-[13px] font-semibold transition-all duration-300 <?= strpos($currentUri, '/admin/categories') === 0 ? 'bg-brand-text text-brand-bg' : 'text-brand-muted hover:text-brand-text hover:bg-brand-border/40' ?>" onclick="closeAdminSidebarOnMobile()">
+                    <svg class="w-4 h-4 stroke-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                    </svg>
+                    Categories
+                </a>
+                <a href="/admin/orders" class="flex items-center gap-3 px-4 py-3.5 rounded-brand text-[13px] font-semibold transition-all duration-300 <?= strpos($currentUri, '/admin/orders') === 0 ? 'bg-brand-text text-brand-bg' : 'text-brand-muted hover:text-brand-text hover:bg-brand-border/40' ?>" onclick="closeAdminSidebarOnMobile()">
+                    <svg class="w-4 h-4 stroke-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Orders
+                </a>
+                <a href="/admin/discounts" class="flex items-center gap-3 px-4 py-3.5 rounded-brand text-[13px] font-semibold transition-all duration-300 <?= strpos($currentUri, '/admin/discounts') === 0 ? 'bg-brand-text text-brand-bg' : 'text-brand-muted hover:text-brand-text hover:bg-brand-border/40' ?>" onclick="closeAdminSidebarOnMobile()">
+                    <svg class="w-4 h-4 stroke-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M6 20h.01M10 21l-7-7 1.414-1.414 7 7L10 21zm2-10l-7-7 1.414-1.414 7 7L12 11zm8-3a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    Discounts
+                </a>
+                <a href="/admin/suppliers" class="flex items-center gap-3 px-4 py-3.5 rounded-brand text-[13px] font-semibold transition-all duration-300 <?= strpos($currentUri, '/admin/suppliers') === 0 ? 'bg-brand-text text-brand-bg' : 'text-brand-muted hover:text-brand-text hover:bg-brand-border/40' ?>" onclick="closeAdminSidebarOnMobile()">
+                    <svg class="w-4 h-4 stroke-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    Suppliers
+                </a>
+                <a href="/admin/purchase-orders" class="flex items-center gap-3 px-4 py-3.5 rounded-brand text-[13px] font-semibold transition-all duration-300 <?= strpos($currentUri, '/admin/purchase-orders') === 0 ? 'bg-brand-text text-brand-bg' : 'text-brand-muted hover:text-brand-text hover:bg-brand-border/40' ?>" onclick="closeAdminSidebarOnMobile()">
+                    <svg class="w-4 h-4 stroke-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                    Purchase Orders
+                </a>
+                
+                <hr class="border-brand-border my-3">
+
+                <a href="/" class="flex items-center gap-3 px-4 py-3.5 rounded-brand text-[13px] font-semibold text-brand-muted hover:text-brand-text hover:bg-brand-border/40 transition-all duration-300">
+                    <svg class="w-4 h-4 stroke-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    Storefront
+                </a>
+                <a href="/logout" class="flex items-center gap-3 px-4 py-3.5 rounded-brand text-[13px] font-semibold text-brand-error hover:bg-brand-errorBg transition-all duration-300">
+                    <svg class="w-4 h-4 stroke-current" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    Logout
+                </a>
+            </nav>
+        </div>
+
+        <script>
+        function toggleAdminSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            const overlay = document.getElementById('adminSidebarOverlay');
+            if (sidebar && overlay) {
+                const isClosed = sidebar.classList.contains('-translate-x-full');
+                if (isClosed) {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                    setTimeout(() => overlay.classList.add('opacity-100'), 10);
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.remove('opacity-100');
+                    setTimeout(() => overlay.classList.add('hidden'), 300);
+                }
+            }
+        }
+        function closeAdminSidebarOnMobile() {
+            if (window.innerWidth < 1024) {
+                toggleAdminSidebar();
+            }
+        }
+        </script>
+
+        <main class="w-full lg:pl-[260px] min-h-screen bg-brand-bg">
+            <div class="p-6 md:p-10 max-w-[1400px] mx-auto">
+    <?php else: ?>
+        <main class="max-w-[1280px] mx-auto px-8 pb-24 min-h-[calc(100vh-200px)]">
+    <?php endif; ?>

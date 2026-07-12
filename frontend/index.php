@@ -49,6 +49,10 @@ function route_public(string $uri, string $method): void
             render('home');
             break;
 
+        case $uri === '/favorites':
+            render('favorites');
+            break;
+
         case $uri === '/products':
             render('products');
             break;
@@ -217,6 +221,107 @@ function route_admin(string $path, string $method): void
                 handle_admin_discount_delete((int) $_GET['delete']);
             }
             render('admin/discounts');
+            break;
+
+        case $path === '/suppliers':
+            if ($method === 'POST') {
+                if (isset($_GET['delete'])) {
+                    $result = api_delete('/suppliers/' . (int) $_GET['delete']);
+                    if ($result['code'] === 200) {
+                        $_SESSION['_flash']['success'] = 'Supplier deleted';
+                    } else {
+                        $_SESSION['_flash']['error'] = $result['data']['error'] ?? 'Failed to delete supplier';
+                    }
+                } elseif (isset($_GET['edit'])) {
+                    $result = api_put('/suppliers/' . (int) $_GET['edit'], [
+                        'name' => $_POST['name'] ?? '',
+                        'contact_name' => $_POST['contact_name'] ?? '',
+                        'email' => $_POST['email'] ?? '',
+                        'phone' => $_POST['phone'] ?? ''
+                    ]);
+                    if ($result['code'] === 200) {
+                        $_SESSION['_flash']['success'] = 'Supplier updated';
+                    } else {
+                        $_SESSION['_flash']['error'] = $result['data']['error'] ?? 'Failed to update supplier';
+                    }
+                } else {
+                    $result = api_post('/suppliers', [
+                        'name' => $_POST['name'] ?? '',
+                        'contact_name' => $_POST['contact_name'] ?? '',
+                        'email' => $_POST['email'] ?? '',
+                        'phone' => $_POST['phone'] ?? ''
+                    ]);
+                    if ($result['code'] === 201) {
+                        $_SESSION['_flash']['success'] = 'Supplier created';
+                    } else {
+                        $_SESSION['_flash']['error'] = $result['data']['error'] ?? 'Failed to create supplier';
+                    }
+                }
+                redirect('/admin/suppliers');
+            }
+            render('admin/suppliers');
+            break;
+
+        case $path === '/purchase-orders':
+            if ($method === 'POST' && isset($_GET['delete'])) {
+                $result = api_delete('/purchase-orders/' . (int) $_GET['delete']);
+                if ($result['code'] === 200) {
+                    $_SESSION['_flash']['success'] = 'Purchase order deleted';
+                } else {
+                    $_SESSION['_flash']['error'] = $result['data']['error'] ?? 'Failed to delete purchase order';
+                }
+                redirect('/admin/purchase-orders');
+            }
+            render('admin/purchase-orders');
+            break;
+
+        case $path === '/purchase-orders/new':
+            if ($method === 'POST') {
+                $supplierId = (int) ($_POST['supplier_id'] ?? 0);
+                $variants = $_POST['variants'] ?? [];
+                $quantities = $_POST['quantities'] ?? [];
+                $costs = $_POST['costs'] ?? [];
+
+                $items = [];
+                foreach ($variants as $idx => $vId) {
+                    $items[] = [
+                        'variant_id' => (int) $vId,
+                        'quantity' => (int) ($quantities[$idx] ?? 0),
+                        'unit_cost' => (float) ($costs[$idx] ?? 0.00)
+                    ];
+                }
+
+                $result = api_post('/purchase-orders', [
+                    'supplier_id' => $supplierId,
+                    'items' => $items
+                ]);
+
+                if ($result['code'] === 201) {
+                    $_SESSION['_flash']['success'] = 'Purchase Order created';
+                    redirect('/admin/purchase-orders');
+                } else {
+                    $_SESSION['_flash']['error'] = $result['data']['error'] ?? 'Failed to create PO';
+                    redirect('/admin/purchase-orders/new');
+                }
+            } else {
+                render('admin/purchase-order-new');
+            }
+            break;
+
+        case preg_match('#^/purchase-orders/(\d+)$#', $path, $m):
+            $poId = (int) $m[1];
+            if ($method === 'POST') {
+                $status = $_POST['status'] ?? '';
+                $result = api_request('PATCH', "/purchase-orders/$poId/status", ['status' => $status]);
+                if ($result['code'] === 200) {
+                    $_SESSION['_flash']['success'] = 'Purchase order status updated to ' . $status;
+                } else {
+                    $_SESSION['_flash']['error'] = $result['data']['error'] ?? 'Failed to update PO status';
+                }
+                redirect("/admin/purchase-orders/$poId");
+            } else {
+                render('admin/purchase-order-view', ['poId' => $poId]);
+            }
             break;
 
         default:

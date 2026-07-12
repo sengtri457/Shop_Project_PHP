@@ -15,6 +15,8 @@ use App\Controllers\AddressController;
 use App\Controllers\CustomerController;
 use App\Controllers\TagController;
 use App\Controllers\DiscountController;
+use App\Controllers\SupplierController;
+use App\Controllers\PurchaseOrderController;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -60,6 +62,21 @@ $router->get('/orders',            [OrderController::class, 'index']);
 $router->post('/orders',           [OrderController::class, 'store']);
 $router->get('/orders/{id}',       [OrderController::class, 'show']);
 $router->patch('/orders/{id}/status', [OrderController::class, 'updateStatus']);
+$router->get('/admin/stats', [OrderController::class, 'adminStats']);
+
+// ---- Suppliers ----
+$router->get('/suppliers',             [SupplierController::class, 'index']);
+$router->post('/suppliers',            [SupplierController::class, 'store']);
+$router->get('/suppliers/{id}',        [SupplierController::class, 'show']);
+$router->put('/suppliers/{id}',        [SupplierController::class, 'update']);
+$router->delete('/suppliers/{id}',     [SupplierController::class, 'destroy']);
+
+// ---- Purchase Orders ----
+$router->get('/purchase-orders',            [PurchaseOrderController::class, 'index']);
+$router->post('/purchase-orders',           [PurchaseOrderController::class, 'store']);
+$router->get('/purchase-orders/{id}',       [PurchaseOrderController::class, 'show']);
+$router->patch('/purchase-orders/{id}/status', [PurchaseOrderController::class, 'updateStatus']);
+$router->delete('/purchase-orders/{id}',     [PurchaseOrderController::class, 'destroy']);
 
 // ---- Customer Profile ----
 $router->get('/customer',    [CustomerController::class, 'show']);

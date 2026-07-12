@@ -120,3 +120,45 @@ function flash(string $key): string
     unset($_SESSION['_flash'][$key]);
     return $val;
 }
+
+function asset_url(string $path): string
+{
+    $path = trim($path);
+    if (empty($path)) {
+        return '/assets/images/hero_banner.png';
+    }
+    
+    // If it is an external URL (starts with http:// or https://)
+    if (preg_match('#^https?://#i', $path)) {
+        return $path;
+    }
+    
+    // If it starts with 'frontend/', strip it (since document root is 'frontend/')
+    if (strpos($path, 'frontend/') === 0) {
+        $path = substr($path, 9);
+    }
+    
+    // If it has a leading slash, return it
+    if (strpos($path, '/') === 0) {
+        return $path;
+    }
+    
+    // Prepend a leading slash
+    return '/' . $path;
+}
+
+function split_image_urls(string $imagesStr): array
+{
+    $imagesStr = trim($imagesStr);
+    if (empty($imagesStr)) {
+        return [];
+    }
+    
+    // Split by commas followed by http/https or a leading slash
+    $parts = preg_split('/,(?=\s*(?:https?:\/\/|\/))/i', $imagesStr);
+    if ($parts === false) {
+        return [];
+    }
+    
+    return array_filter(array_map('trim', $parts));
+}

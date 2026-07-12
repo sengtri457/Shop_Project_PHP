@@ -12,11 +12,7 @@ if (!$product):
     <a href="/products" class="btn">Back to Products</a>
 </div>
 <?php else:
-    // Extract gallery images
-    $galleryImages = [];
-    if (!empty($product['images'])) {
-        $galleryImages = array_filter(array_map('trim', explode(',', $product['images'])));
-    }
+    $galleryImages = split_image_urls($product['images'] ?? '');
     
     // Supplement with variant images
     if (!empty($product['variants'])) {
@@ -26,6 +22,8 @@ if (!$product):
             }
         }
     }
+
+    $galleryImages = array_map('asset_url', $galleryImages);
     
     // Fallback if none exist
     if (empty($galleryImages)) {
@@ -84,7 +82,7 @@ if (!$product):
                          alt="Thumbnail <?= $index + 1 ?>" 
                          onclick="switchMainImage(<?= $index ?>)" 
                          class="thumb-img"
-                         style="width: 100%; height: 95px; object-fit: cover; border-radius: 4px; border: 2px solid <?= $index === 0 ? 'var(--color-black)' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;"
+                         style="width: 100%; height: 95px; object-fit: cover; border-radius: 4px; border: 2px solid <?= $index === 0 ? 'var(--color-text-main)' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;"
                          data-index="<?= $index ?>">
                 <?php endforeach; ?>
             </div>
@@ -195,7 +193,7 @@ if (!$product):
                     </div>
 
                     <!-- Add to Bag Button -->
-                    <button type="submit" id="add-to-cart-btn" class="btn btn-primary btn-large" style="width: 100%; justify-content: center; background: var(--color-black); color: #fff; border-color: var(--color-black);" disabled>
+                    <button type="submit" id="add-to-cart-btn" class="btn btn-primary btn-large" style="width: 100%; justify-content: center;" disabled>
                         Add to Bag
                     </button>
                 </form>
@@ -250,7 +248,7 @@ function switchMainImage(index) {
     // Update active thumb border
     document.querySelectorAll('.thumb-img').forEach(thumb => {
         if (parseInt(thumb.getAttribute('data-index')) === index) {
-            thumb.style.borderColor = 'var(--color-black)';
+            thumb.style.borderColor = 'var(--color-text-main)';
         } else {
             thumb.style.borderColor = 'transparent';
         }
@@ -317,13 +315,13 @@ function selectColor(color) {
     selectedColor = color;
     document.querySelectorAll('.color-btn').forEach(btn => {
         if (btn.innerText.trim() === color) {
-            btn.style.borderColor = 'var(--color-black)';
-            btn.style.background = 'var(--color-black)';
-            btn.style.color = '#fff';
+            btn.style.borderColor = 'var(--color-text-main)';
+            btn.style.background = 'var(--color-text-main)';
+            btn.style.color = 'var(--color-bg)';
         } else {
-            btn.style.borderColor = 'var(--color-gray-light)';
+            btn.style.borderColor = 'var(--color-border-light)';
             btn.style.background = '#fff';
-            btn.style.color = 'var(--color-dark)';
+            btn.style.color = 'var(--color-text-main)';
         }
     });
     
@@ -335,13 +333,13 @@ function selectSize(size) {
     selectedSize = size;
     document.querySelectorAll('.size-btn').forEach(btn => {
         if (btn.innerText.trim() === size) {
-            btn.style.background = 'var(--color-black)';
-            btn.style.color = '#fff';
-            btn.style.borderColor = 'var(--color-black)';
+            btn.style.background = 'var(--color-text-main)';
+            btn.style.color = 'var(--color-bg)';
+            btn.style.borderColor = 'var(--color-text-main)';
         } else {
             btn.style.background = '#fff';
-            btn.style.color = 'var(--color-dark)';
-            btn.style.borderColor = 'var(--color-gray-light)';
+            btn.style.color = 'var(--color-text-main)';
+            btn.style.borderColor = 'var(--color-border-light)';
         }
     });
     updateSelectedVariant();
