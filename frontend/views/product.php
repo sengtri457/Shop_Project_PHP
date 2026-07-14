@@ -192,10 +192,20 @@ if (!$product):
                         <div id="qty-error-message" style="color: var(--color-error); font-size: 13px; font-weight: 600; margin-top: 8px; display: none;"></div>
                     </div>
 
-                    <!-- Add to Bag Button -->
-                    <button type="submit" id="add-to-cart-btn" class="btn btn-primary btn-large" style="width: 100%; justify-content: center;" disabled>
-                        Add to Bag
-                    </button>
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 12px; align-items: center; width: 100%;">
+                        <!-- Add to Bag Button -->
+                        <button type="submit" id="add-to-cart-btn" class="btn btn-primary btn-large" style="flex: 1; justify-content: center; height: 50px;" disabled>
+                            Add to Bag
+                        </button>
+                        
+                        <!-- Add to Favorites Button -->
+                        <button type="button" onclick="toggleFav(<?= (int)$product['id'] ?>, event)" class="fav-btn btn" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-gray-light); border-radius: var(--border-radius); background: #fff; cursor: pointer; transition: all 0.2s;" data-fav-id="<?= (int)$product['id'] ?>">
+                            <svg class="w-5 h-5 text-brand-muted hover:text-brand-error transition-colors" viewBox="0 0 24 24">
+                                <path fill="none" stroke="currentColor" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </form>
             <?php endif; ?>
             

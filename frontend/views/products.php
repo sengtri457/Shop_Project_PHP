@@ -119,30 +119,39 @@ if ($gender === 'men') {
                 $mainImg = !empty($prodImages) ? asset_url($prodImages[0]) : '/assets/images/hero_banner.png';
                 $discountPercent = (int) ($product['discount_percent'] ?? 0);
             ?>
-                <a href="/products/<?= $product['id'] ?>" class="product-card">
-                    <img src="<?= htmlspecialchars($mainImg) ?>" 
-                         alt="<?= htmlspecialchars($product['name']) ?>" 
-                         style="width: 100%; height: 240px; object-fit: cover; border-radius: var(--border-radius); margin-bottom: 15px;">
-                    <?php if (!empty($product['brand'])): ?>
-                        <span class="brand" style="margin-bottom: 4px; font-size: 11px; text-transform: uppercase; color: var(--color-gray);"><?= htmlspecialchars($product['brand']) ?></span>
-                    <?php endif; ?>
-                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;"><?= htmlspecialchars($product['name']) ?></h3>
-                    <?php if ($discountPercent > 0): ?>
-                        <p class="price" style="display: flex; gap: 8px; align-items: center; margin-top: auto;">
-                            <span style="color: var(--color-error); font-weight: bold;">
-                                $<?= number_format($product['base_price'] * (1 - $discountPercent / 100), 2) ?>
-                            </span>
-                            <span style="font-size: 11px; font-weight: 600; color: var(--color-error); background: #fee8e6; padding: 1px 4px; border-radius: 3px;">
-                                -<?= $discountPercent ?>%
-                            </span>
-                            <span style="color: var(--color-gray); text-decoration: line-through; font-size: 12px; font-weight: normal;">
-                                $<?= number_format($product['base_price'], 2) ?>
-                            </span>
-                        </p>
-                    <?php else: ?>
-                        <p class="price" style="margin-top: auto;">$<?= number_format($product['base_price'], 2) ?></p>
-                    <?php endif; ?>
-                </a>
+                <div style="position: relative; display: flex; flex-direction: column; height: 100%;">
+                    <!-- Favorite Toggle Button Overlay -->
+                    <button type="button" onclick="toggleFav(<?= (int)$product['id'] ?>, event)" class="fav-btn" style="position: absolute; top: 12px; right: 12px; z-index: 20; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.95); border: 1px solid var(--color-gray-light); display: flex; align-items: center; justify-content: center; cursor: pointer; outline: none; transition: transform 0.2s;" data-fav-id="<?= (int)$product['id'] ?>">
+                        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; display: block;">
+                            <path fill="none" stroke="currentColor" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
+                        </svg>
+                    </button>
+
+                    <a href="/products/<?= $product['id'] ?>" class="product-card" style="display: flex; flex-direction: column; height: 100%; text-decoration: none; color: inherit;">
+                        <img src="<?= htmlspecialchars($mainImg) ?>" 
+                             alt="<?= htmlspecialchars($product['name']) ?>" 
+                             style="width: 100%; height: 240px; object-fit: cover; border-radius: var(--border-radius); margin-bottom: 15px;">
+                        <?php if (!empty($product['brand'])): ?>
+                            <span class="brand" style="margin-bottom: 4px; font-size: 11px; text-transform: uppercase; color: var(--color-gray);"><?= htmlspecialchars($product['brand']) ?></span>
+                        <?php endif; ?>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;"><?= htmlspecialchars($product['name']) ?></h3>
+                        <?php if ($discountPercent > 0): ?>
+                            <p class="price" style="display: flex; gap: 8px; align-items: center; margin-top: auto;">
+                                <span style="color: var(--color-error); font-weight: bold;">
+                                    $<?= number_format($product['base_price'] * (1 - $discountPercent / 100), 2) ?>
+                                </span>
+                                <span style="font-size: 11px; font-weight: 600; color: var(--color-error); background: #fee8e6; padding: 1px 4px; border-radius: 3px;">
+                                    -<?= $discountPercent ?>%
+                                </span>
+                                <span style="color: var(--color-gray); text-decoration: line-through; font-size: 12px; font-weight: normal;">
+                                    $<?= number_format($product['base_price'], 2) ?>
+                                </span>
+                            </p>
+                        <?php else: ?>
+                            <p class="price" style="margin-top: auto;">$<?= number_format($product['base_price'], 2) ?></p>
+                        <?php endif; ?>
+                    </a>
+                </div>
             <?php endforeach; ?>
         </div>
 

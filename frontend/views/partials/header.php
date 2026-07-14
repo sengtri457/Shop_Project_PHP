@@ -56,6 +56,15 @@
         }
     </script>
     <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .fav-btn.favorited svg {
+            color: #9E2A2B !important;
+        }
+        .fav-btn.favorited svg path {
+            fill: currentColor !important;
+            stroke: currentColor !important;
+        }
+    </style>
 </head>
 <body class="bg-brand-bg text-brand-text font-sans antialiased">
     <!-- Top Progress Loading Bar -->
@@ -68,6 +77,16 @@
         if ($path === '/' && $currentUri === '/') return 'active';
         if ($path !== '/' && strpos($currentUri, $path) === 0) return 'active';
         return '';
+    }
+
+    $cartCount = 0;
+    if (function_exists('cart_session_id')) {
+        $cartRes = api_get('/cart?session_id=' . cart_session_id());
+        if (!empty($cartRes['data']['items'])) {
+            foreach ($cartRes['data']['items'] as $item) {
+                $cartCount += (int)$item['quantity'];
+            }
+        }
     }
     ?>
     <?php 
@@ -207,7 +226,10 @@
                     <span id="fav-badge-count" class="hidden text-[9px] font-bold bg-brand-accent text-white px-1.5 py-0.5 rounded-full leading-none">0</span>
                 </a>
 
-                <a href="/cart" class="text-[12px] font-medium tracking-widest uppercase text-brand-muted hover:text-brand-text py-1.5 relative <?= isActive('/cart', $currentUri) === 'active' ? 'text-brand-text after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-brand-accent' : '' ?>">Cart</a>
+                <a href="/cart" class="text-[12px] font-medium tracking-widest uppercase text-brand-muted hover:text-brand-text py-1.5 relative <?= isActive('/cart', $currentUri) === 'active' ? 'text-brand-text after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-brand-accent' : '' ?> flex items-center gap-1">
+                    <span>Cart</span>
+                    <span id="cart-badge-count" class="<?= $cartCount > 0 ? '' : 'hidden' ?> text-[9px] font-bold bg-brand-accent text-white px-1.5 py-0.5 rounded-full leading-none"><?= $cartCount ?></span>
+                </a>
                 
                 <!-- ACCOUNT DROPDOWN -->
                 <div class="group relative">
@@ -264,7 +286,10 @@
             <a href="/products?gender=men" class="text-[14px] font-medium tracking-widest uppercase text-brand-text <?= isset($_GET['gender']) && $_GET['gender'] === 'men' ? 'text-brand-accent' : '' ?>" onclick="toggleMobileNav()">Men</a>
             <a href="/products?gender=women" class="text-[14px] font-medium tracking-widest uppercase text-brand-text <?= isset($_GET['gender']) && $_GET['gender'] === 'women' ? 'text-brand-accent' : '' ?>" onclick="toggleMobileNav()">Women</a>
             <a href="/products?gender=kids" class="text-[14px] font-medium tracking-widest uppercase text-brand-text <?= isset($_GET['gender']) && $_GET['gender'] === 'kids' ? 'text-brand-accent' : '' ?>" onclick="toggleMobileNav()">Kids</a>
-            <a href="/cart" class="text-[14px] font-medium tracking-widest uppercase text-brand-text <?= isActive('/cart', $currentUri) === 'active' ? 'text-brand-accent' : '' ?>" onclick="toggleMobileNav()">Cart</a>
+            <a href="/cart" class="text-[14px] font-medium tracking-widest uppercase text-brand-text <?= isActive('/cart', $currentUri) === 'active' ? 'text-brand-accent' : '' ?> flex items-center gap-1.5" onclick="toggleMobileNav()">
+                <span>Cart</span>
+                <span class="<?= $cartCount > 0 ? '' : 'hidden' ?> text-[10px] font-bold bg-brand-accent text-white px-2 py-0.5 rounded-full leading-none"><?= $cartCount ?></span>
+            </a>
             <?php if (is_logged_in()): ?>
                 <span class="text-[13px] font-semibold tracking-widest uppercase text-brand-text mb-2 inline-block">
                     <?= htmlspecialchars($_SESSION['customer']['name'] ?? '') ?>

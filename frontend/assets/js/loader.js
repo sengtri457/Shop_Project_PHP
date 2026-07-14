@@ -394,6 +394,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Add to Cart Forms (Submit via AJAX optionally or direct browser native POST)
         // Since POST is destructive, we let standard form actions run unless they are GET forms like filter lists.
+        if (typeof window.updateFavUI === 'function') {
+            window.updateFavUI();
+        }
     }
 
     // Global click listener for SPA interception
@@ -437,4 +440,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Push initial history state for current load
     window.history.replaceState({ url: window.location.href }, '', window.location.href);
+
+    window.toggleFav = function(productId, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        let favs = JSON.parse(localStorage.getItem('fav_products') || '[]');
+        productId = parseInt(productId);
+        
+        if (favs.includes(productId)) {
+            favs = favs.filter(id => id !== productId);
+        } else {
+            favs.push(productId);
+        }
+        
+        localStorage.setItem('fav_products', JSON.stringify(favs));
+        window.updateFavUI();
+        
+        if (window.location.pathname === '/favorites') {
+            const idsParam = favs.join(',');
+            const targetUrl = '/favorites' + (favs.length > 0 ? '?ids=' + idsParam : '');
+            navigateTo(targetUrl);
+        }
+    };
+
+    window.updateFavUI = function() {
+        const favs = JSON.parse(localStorage.getItem('fav_products') || '[]');
+        const badge = document.getElementById('fav-badge-count');
+        if (badge) {
+            badge.textContent = favs.length;
+            if (favs.length > 0) {
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+        
+        const buttons = document.querySelectorAll('.fav-btn');
+        buttons.forEach(btn => {
+            const id = parseInt(btn.getAttribute('data-fav-id'));
+            if (!isNaN(id)) {
+                if (favs.includes(id)) {
+                    btn.classList.add('favorited');
+                } else {
+                    btn.classList.remove('favorited');
+                }
+            }
+        });
+    };
+
+    // Initial update on page load
+    window.updateFavUI();
 });
