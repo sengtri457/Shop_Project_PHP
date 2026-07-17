@@ -2,13 +2,13 @@
 function getCategoryImage(string $name): string {
     $name = strtolower(trim($name));
     $map = [
-        'linen'       => 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=600&auto=format&fit=crop',
-        'cotton'      => 'https://images.unsplash.com/photo-1520639888713-7851133b1ed0?q=80&w=600&auto=format&fit=crop',
-        'silk'        => 'https://images.unsplash.com/photo-1582533561751-ef6f6ab93a2e?q=80&w=600&auto=format&fit=crop',
-        'men'         => 'https://images.unsplash.com/photo-1488161628813-04466f872be2?q=80&w=600&auto=format&fit=crop',
-        'women'       => 'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=600&auto=format&fit=crop',
-        'shoes'       => 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=600&auto=format&fit=crop',
-        'accessories' => 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?q=80&w=600&auto=format&fit=crop',
+        'linen'       => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1093,c_limit/6e13f4e5-6b87-4687-b3b0-c1bb14ebbb75/nike-just-do-it.jpg',
+        'cotton'      => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1093,c_limit/6e13f4e5-6b87-4687-b3b0-c1bb14ebbb75/nike-just-do-it.jpg',
+        'silk'        => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1093,c_limit/6e13f4e5-6b87-4687-b3b0-c1bb14ebbb75/nike-just-do-it.jpg',
+        'men'         => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1093,c_limit/6e13f4e5-6b87-4687-b3b0-c1bb14ebbb75/nike-just-do-it.jpg',
+        'women'       => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1093,c_limit/6e13f4e5-6b87-4687-b3b0-c1bb14ebbb75/nike-just-do-it.jpg',
+        'shoes'       => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1198,c_limit/f5100f5d-1df6-4558-b407-701bbbfc571f/nike-just-do-it.jpg',
+        'accessories' => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1093,c_limit/6e13f4e5-6b87-4687-b3b0-c1bb14ebbb75/nike-just-do-it.jpgp',
     ];
     
     foreach ($map as $key => $url) {
@@ -178,7 +178,14 @@ function getCategoryImage(string $name): string {
 
                     <a href="/products/<?= $product['id'] ?>" class="flex flex-col h-full">
                         <div class="w-full aspect-[3/4] overflow-hidden rounded-brand bg-brand-darker mb-3 relative border border-brand-border">
-                            <img src="<?= htmlspecialchars($mainImg) ?>" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-102" alt="<?= htmlspecialchars($product['name']) ?>">
+                            <img src="<?= htmlspecialchars($mainImg) ?>" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" alt="<?= htmlspecialchars($product['name']) ?>">
+                            
+                            <!-- Quick View Overlay -->
+                            <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                                <button type="button" onclick="openQuickView(<?= (int)$product['id'] ?>, event)" class="pointer-events-auto bg-brand-bg/95 hover:bg-brand-bg text-brand-text text-[10px] font-bold uppercase tracking-widest py-2.5 px-5 rounded shadow-lg transition-all translate-y-3 group-hover:translate-y-0 duration-300">
+                                    Quick View
+                                </button>
+                            </div>
                         </div>
                         <?php if (!empty($product['brand'])): ?>
                             <span class="font-sans text-[10px] font-semibold uppercase tracking-wider text-brand-muted mb-1"><?= htmlspecialchars($product['brand']) ?></span>

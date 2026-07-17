@@ -126,13 +126,18 @@ if (empty($chartLabels)) {
                                     $attrs = json_decode($item['attributes'] ?? '{}', true);
                                     $attrStr = !empty($attrs) ? implode(' / ', $attrs) : '';
                                 ?>
-                                    <div class="p-3 bg-brand-darker border-l-[3px] border-brand-accent rounded flex justify-between items-center">
+                                    <div class="p-3.5 bg-brand-darker border-l-[3px] border-brand-accent rounded flex justify-between items-center gap-4">
                                         <div>
                                             <h4 class="font-sans text-[12.5px] font-semibold text-brand-text leading-snug"><?= htmlspecialchars($item['product_name']) ?></h4>
                                             <p class="text-[10.5px] text-brand-muted mt-0.5">SKU: <?= htmlspecialchars($item['sku']) ?> <?= $attrStr ? " | $attrStr" : "" ?></p>
                                         </div>
-                                        <div class="text-right">
+                                        <div class="flex items-center gap-3.5 flex-shrink-0">
                                             <span class="text-[13px] font-bold text-brand-accent"><?= $item['stock_qty'] ?> left</span>
+                                            <a href="/admin/purchase-orders/new?variant_id=<?= $item['id'] ?>&qty=20" class="p-1.5 bg-brand-accent text-white hover:bg-brand-accentHover rounded transition-colors shadow-sm" title="Reorder 20 units">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
+                                                </svg>
+                                            </a>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>

@@ -17,6 +17,7 @@ use App\Controllers\TagController;
 use App\Controllers\DiscountController;
 use App\Controllers\SupplierController;
 use App\Controllers\PurchaseOrderController;
+use App\Controllers\ProductReviewController;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -56,6 +57,7 @@ $router->get('/cart',                    [CartController::class, 'show']);
 $router->post('/cart/items',             [CartController::class, 'addItem']);
 $router->patch('/cart/items/{itemId}',   [CartController::class, 'updateQuantity']);
 $router->delete('/cart/items/{itemId}',  [CartController::class, 'removeItem']);
+$router->delete('/cart',                 [CartController::class, 'clear']);
 
 // ---- Orders ----
 $router->get('/orders',            [OrderController::class, 'index']);
@@ -103,6 +105,10 @@ $router->put('/discounts/{id}',        [DiscountController::class, 'update']);
 $router->patch('/discounts/{id}',      [DiscountController::class, 'update']);
 $router->delete('/discounts/{id}',     [DiscountController::class, 'destroy']);
 $router->post('/discounts/validate',   [DiscountController::class, 'validateCode']);
+
+// ---- Reviews ----
+$router->get('/products/{id}/reviews',  [ProductReviewController::class, 'index']);
+$router->post('/products/{id}/reviews', [ProductReviewController::class, 'store']);
 
 $uri   = $_SERVER['REQUEST_URI'];
 $uri   = parse_url($uri, PHP_URL_PATH);

@@ -156,6 +156,32 @@ function escapeHtml(text) {
         .replace(/'/g, "&#039;");
 }
 
-// Start with 1 row automatically
-addRow();
+// Check query parameters to prefill variant restocking
+(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const variantId = urlParams.get('variant_id');
+    const qty = urlParams.get('qty');
+    
+    if (variantId) {
+        addRow();
+        const container = document.getElementById('itemsContainer');
+        const lastRow = container.lastElementChild;
+        if (lastRow) {
+            const select = lastRow.querySelector('select[name="variants[]"]');
+            const qtyInput = lastRow.querySelector('input[name="quantities[]"]');
+            const costInput = lastRow.querySelector('input[name="costs[]"]');
+            
+            if (select) select.value = variantId;
+            if (qtyInput && qty) qtyInput.value = qty;
+            
+            // Prefill wholesale cost estimate (e.g. 60% of retail)
+            const match = variants.find(v => v.id == variantId);
+            if (match && costInput) {
+                costInput.value = (match.price * 0.6).toFixed(2);
+            }
+        }
+    } else {
+        addRow();
+    }
+})();
 </script>

@@ -3,6 +3,11 @@ $productId = $productId ?? null;
 $result = api_get("/products/$productId");
 $product = $result['data'] ?? [];
 
+$reviewsResult = api_get("/products/$productId/reviews");
+$reviewsData = $reviewsResult['data'] ?? [];
+$reviewSummary = $reviewsData['summary'] ?? ['total_reviews' => 0, 'average_rating' => 0.0];
+$reviewsList = $reviewsData['reviews'] ?? [];
+
 if (!$product):
     http_response_code(404);
 ?>
@@ -111,6 +116,21 @@ if (!$product):
             <?php endif; ?>
             
             <h1 style="font-family: var(--font-serif); font-size: 2.4rem; margin-top: 5px; margin-bottom: 12px; font-weight: 500; line-height: 1.2;"><?= htmlspecialchars($product['name']) ?></h1>
+
+            <?php if ($reviewSummary['total_reviews'] > 0): ?>
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 16px; font-size: 13px;">
+                    <div style="display: flex; color: #fbbf24; gap: 2px;">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <svg fill="<?= $i <= round($reviewSummary['average_rating']) ? 'currentColor' : 'none' ?>" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11.049 2.927c.3-.9 1.603-.9 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.36 1.246.582 1.817l-3.97 2.883a1 1 0 00-.364 1.118l1.518 4.674c.3.9-.752 1.661-1.485 1.1l-3.97-2.883a1 1 0 00-1.175 0l-3.97 2.883c-.733.56-1.786-.2-1.485-1.1l1.518-4.674a1 1 0 00-.364-1.118L2.98 10.11c-.778-.57-.379-1.817.582-1.817h4.907a1 1 0 00.95-.69l1.519-4.674z"></path>
+                            </svg>
+                        <?php endfor; ?>
+                    </div>
+                    <span style="font-weight: 600; color: var(--color-black);"><?= number_format($reviewSummary['average_rating'], 1) ?></span>
+                    <span style="color: var(--color-gray-light);">|</span>
+                    <span style="color: var(--color-gray-dark);"><?= $reviewSummary['total_reviews'] ?> <?= $reviewSummary['total_reviews'] === 1 ? 'review' : 'reviews' ?></span>
+                </div>
+            <?php endif; ?>
 
             <!-- Before/After Discount Price Display -->
             <div id="variant-price-display" style="font-size: 1.8rem; margin-bottom: 24px; font-family: var(--font-sans);">
@@ -239,9 +259,191 @@ if (!$product):
             <?php endif; ?>
         </div>
     </div>
+
+    <!-- RATINGS & REVIEWS SECTION -->
+    <div style="border-top: 1px solid var(--color-gray-light); margin-top: 60px; padding-top: 40px;">
+        <h2 style="font-family: var(--font-serif); font-size: 1.8rem; font-weight: 500; margin-bottom: 30px;">Ratings & Reviews</h2>
+        
+        <div class="reviews-layout" style="display: grid; grid-template-columns: 1fr 2fr; gap: 50px;">
+            <!-- Left: Summaries -->
+            <div class="reviews-summary" style="display: flex; flex-direction: column; gap: 24px;">
+                <div style="background: var(--color-gray-bg); padding: 30px; border-radius: var(--border-radius); border: 1px solid var(--color-gray-light); text-align: center;">
+                    <h3 style="font-size: 3rem; font-weight: 700; color: var(--color-black); margin-bottom: 5px;"><?= number_format($reviewSummary['average_rating'], 1) ?></h3>
+                    <div style="display: flex; color: #fbbf24; gap: 4px; justify-content: center; margin-bottom: 8px;">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <svg fill="<?= $i <= round($reviewSummary['average_rating']) ? 'currentColor' : 'none' ?>" stroke="currentColor" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.9 1.603-.9 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.36 1.246.582 1.817l-3.97 2.883a1 1 0 00-.364 1.118l1.518 4.674c.3.9-.752 1.661-1.485 1.1l-3.97-2.883a1 1 0 00-1.175 0l-3.97 2.883c-.733.56-1.786-.2-1.485-1.1l1.518-4.674a1 1 0 00-.364-1.118L2.98 10.11c-.778-.57-.379-1.817.582-1.817h4.907a1 1 0 00.95-.69l1.519-4.674z"></path>
+                            </svg>
+                        <?php endfor; ?>
+                    </div>
+                    <p style="color: var(--color-gray-dark); font-size: 13px; font-weight: 500;"><?= $reviewSummary['total_reviews'] ?> customer <?= $reviewSummary['total_reviews'] === 1 ? 'review' : 'reviews' ?></p>
+                </div>
+
+                <!-- Star Distribution Bars -->
+                <?php
+                $ratingsCounts = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+                foreach ($reviewsList as $r) {
+                    $rRating = (int)$r['rating'];
+                    if (isset($ratingsCounts[$rRating])) {
+                        $ratingsCounts[$rRating]++;
+                    }
+                }
+                ?>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <?php for ($stars = 5; $stars >= 1; $stars--): 
+                        $count = $ratingsCounts[$stars];
+                        $pct = $reviewSummary['total_reviews'] > 0 ? ($count / $reviewSummary['total_reviews']) * 100 : 0;
+                    ?>
+                        <div style="display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--color-gray-dark);">
+                            <span style="width: 45px; text-align: right;"><?= $stars ?> stars</span>
+                            <div style="flex: 1; height: 6px; background: var(--color-gray-light); border-radius: 3px; overflow: hidden;">
+                                <div style="width: <?= $pct ?>%; height: 100%; background: var(--color-gray-dark); border-radius: 3px;"></div>
+                            </div>
+                            <span style="width: 30px; text-align: right; color: var(--color-gray);"><?= $count ?></span>
+                        </div>
+                    <?php endfor; ?>
+                </div>
+            </div>
+
+            <!-- Right: Submit Form & Reviews List -->
+            <div style="display: flex; flex-direction: column; gap: 40px;">
+                <!-- Review Form -->
+                <?php if (is_logged_in()): ?>
+                    <div style="background: #fff; border: 1px solid var(--color-gray-light); padding: 30px; border-radius: var(--border-radius);">
+                        <h3 style="font-family: var(--font-serif); font-size: 1.3rem; font-weight: 500; margin-bottom: 20px;">Write a Review</h3>
+                        <form id="review-submit-form" onsubmit="submitReview(event)" style="display: flex; flex-direction: column; gap: 16px;">
+                            <!-- Star Selection Input -->
+                            <div>
+                                <label style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-gray); margin-bottom: 6px;">Select Rating</label>
+                                <div style="display: flex; color: #d1d5db; gap: 6px; cursor: pointer;">
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <svg class="star-rating-select-svg" data-val="<?= $i ?>" onclick="setReviewRating(<?= $i ?>)" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px; transition: color 0.15s;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.9 1.603-.9 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.36 1.246.582 1.817l-3.97 2.883a1 1 0 00-.364 1.118l1.518 4.674c.3.9-.752 1.661-1.485 1.1l-3.97-2.883a1 1 0 00-1.175 0l-3.97 2.883c-.733.56-1.786-.2-1.485-1.1l1.518-4.674a1 1 0 00-.364-1.118L2.98 10.11c-.778-.57-.379-1.817.582-1.817h4.907a1 1 0 00.95-.69l1.519-4.674z"></path>
+                                        </svg>
+                                    <?php endfor; ?>
+                                </div>
+                                <input type="hidden" id="review-rating-input" name="rating" value="0" required>
+                            </div>
+                            <!-- Comment Textarea -->
+                            <div>
+                                <label style="display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-gray); margin-bottom: 6px;">Your Review</label>
+                                <textarea name="comment" rows="4" placeholder="Share your experience with this item..." style="width: 100%; padding: 12px 14px; border: 1px solid var(--color-gray-light); border-radius: var(--border-radius); outline: none; font-size: 14px; resize: vertical;" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="align-self: flex-start; padding: 10px 24px;">Submit Review</button>
+                        </form>
+                    </div>
+                <?php else: ?>
+                    <div style="background: var(--color-gray-bg); padding: 20px; border-radius: var(--border-radius); border: 1px dashed var(--color-gray-light); text-align: center;">
+                        <p style="font-size: 13.5px; color: var(--color-gray-dark);">Please <a href="/login" style="color: var(--color-black); font-weight: 600; text-decoration: underline;">log in</a> to write a customer review.</p>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Reviews List -->
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    <h3 style="font-family: var(--font-serif); font-size: 1.3rem; font-weight: 500; border-bottom: 1px solid var(--color-gray-light); padding-bottom: 12px; margin-bottom: 10px;">Reviews (<?= count($reviewsList) ?>)</h3>
+                    
+                    <?php if (empty($reviewsList)): ?>
+                        <p style="color: var(--color-gray); font-size: 13.5px;">No reviews yet for this product. Be the first to share your thoughts!</p>
+                    <?php else: ?>
+                        <?php foreach ($reviewsList as $rev): ?>
+                            <div style="border-bottom: 1px solid var(--color-gray-light); padding-bottom: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                    <div>
+                                        <h4 style="font-size: 14px; font-weight: 600; color: var(--color-black); margin-bottom: 3px;"><?= htmlspecialchars($rev['customer_name'] ?? 'Verified Buyer') ?></h4>
+                                        <div style="display: flex; color: #fbbf24; gap: 2px;">
+                                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                <svg fill="<?= $i <= (int)$rev['rating'] ? 'currentColor' : 'none' ?>" stroke="currentColor" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.9 1.603-.9 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.36 1.246.582 1.817l-3.97 2.883a1 1 0 00-.364 1.118l1.518 4.674c.3.9-.752 1.661-1.485 1.1l-3.97-2.883a1 1 0 00-1.175 0l-3.97 2.883c-.733.56-1.786-.2-1.485-1.1l1.518-4.674a1 1 0 00-.364-1.118L2.98 10.11c-.778-.57-.379-1.817.582-1.817h4.907a1 1 0 00.95-.69l1.519-4.674z"></path>
+                                                </svg>
+                                            <?php endfor; ?>
+                                        </div>
+                                    </div>
+                                    <span style="font-size: 11px; color: var(--color-gray);"><?= date('M d, Y', strtotime($rev['created_at'])) ?></span>
+                                </div>
+                                <p style="font-size: 13.5px; line-height: 1.6; color: var(--color-gray-dark); white-space: pre-line;"><?= htmlspecialchars($rev['comment']) ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
+// Review form script controllers
+let selectedReviewRating = 0;
+
+function setReviewRating(rating) {
+    selectedReviewRating = rating;
+    document.getElementById('review-rating-input').value = rating;
+    
+    // Highlight stars
+    document.querySelectorAll('.star-rating-select-svg').forEach(svg => {
+        const val = parseInt(svg.getAttribute('data-val'));
+        if (val <= rating) {
+            svg.setAttribute('fill', 'currentColor');
+            svg.style.color = '#fbbf24';
+        } else {
+            svg.setAttribute('fill', 'none');
+            svg.style.color = '#d1d5db';
+        }
+    });
+}
+
+function submitReview(event) {
+    event.preventDefault();
+    const ratingInput = document.getElementById('review-rating-input');
+    const rating = parseInt(ratingInput.value);
+    
+    if (rating < 1) {
+        alert('Please select a star rating first');
+        return;
+    }
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const comment = formData.get('comment');
+    
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+    
+    const token = '<?= $_SESSION['token'] ?? '' ?>';
+    const productId = '<?= $productId ?>';
+    
+    fetch('http://localhost:8000/products/' + productId + '/reviews', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+            rating: rating,
+            comment: comment
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Review';
+        } else {
+            if (window.navigateTo) {
+                window.navigateTo(window.location.href);
+            } else {
+                window.location.reload();
+            }
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('An error occurred. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Review';
+    });
+}
 // Image gallery carousel logic
 const galleryImages = <?= json_encode($galleryImages) ?>;
 let activeImageIndex = 0;
@@ -442,15 +644,50 @@ function updateSelectedVariant() {
     }
 }
 
-// Add submission visual feedback
+// Add submission AJAX interceptor
 const form = document.querySelector('.variant-form');
 if (form) {
-    form.addEventListener('submit', function() {
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
         const btn = document.getElementById('add-to-cart-btn');
         if (btn) {
             btn.disabled = true;
-            btn.innerHTML = '<span style="display:inline-block; animation: spin 1s linear infinite; margin-right: 8px;">↻</span> Adding to Bag...';
+            btn.innerHTML = '<span class="inline-block animate-spin mr-2">↻</span> Adding to Bag...';
         }
+        
+        const variantId = document.getElementById('selected-variant-id').value;
+        const qty = document.getElementById('quantity-input').value;
+        
+        fetch('http://localhost:8000/cart/items', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                session_id: getCartSessionId(),
+                variant_id: variantId,
+                quantity: qty
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Add to Bag';
+            }
+            if (data.error) {
+                alert(data.error);
+            } else {
+                openMiniCart();
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Add to Bag';
+            }
+            alert('Could not add item to bag. Please try again.');
+        });
     });
 }
 

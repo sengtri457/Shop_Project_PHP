@@ -39,7 +39,7 @@ class Cart
     {
         $db = Database::getConnection();
         $stmt = $db->prepare("
-            SELECT ci.id, ci.quantity, pv.id as variant_id, pv.sku, pv.price, pv.attributes, p.name
+            SELECT ci.id, ci.quantity, pv.id as variant_id, pv.sku, pv.price, pv.attributes, p.name, p.images, pv.image_url
             FROM cart_items ci
             JOIN product_variants pv ON ci.variant_id = pv.id
             JOIN products p ON pv.product_id = p.id
@@ -143,5 +143,12 @@ class Cart
         // 4. Delete the guest cart (cascade delete removes guest items)
         $stmt = $db->prepare("DELETE FROM carts WHERE id = ?");
         $stmt->execute([$guestCartId]);
+    }
+
+    public static function clear(int $cartId): void
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare("DELETE FROM cart_items WHERE cart_id = ?");
+        $stmt->execute([$cartId]);
     }
 }

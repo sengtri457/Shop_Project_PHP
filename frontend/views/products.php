@@ -127,10 +127,19 @@ if ($gender === 'men') {
                         </svg>
                     </button>
 
-                    <a href="/products/<?= $product['id'] ?>" class="product-card" style="display: flex; flex-direction: column; height: 100%; text-decoration: none; color: inherit;">
-                        <img src="<?= htmlspecialchars($mainImg) ?>" 
-                             alt="<?= htmlspecialchars($product['name']) ?>" 
-                             style="width: 100%; height: 240px; object-fit: cover; border-radius: var(--border-radius); margin-bottom: 15px;">
+                    <a href="/products/<?= $product['id'] ?>" class="product-card group" style="display: flex; flex-direction: column; height: 100%; text-decoration: none; color: inherit;">
+                        <div class="relative w-full overflow-hidden rounded mb-3.5" style="height: 240px;">
+                            <img src="<?= htmlspecialchars($mainImg) ?>" 
+                                 alt="<?= htmlspecialchars($product['name']) ?>" 
+                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s;" class="group-hover:scale-105">
+                            
+                            <!-- Quick View Overlay -->
+                            <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                                <button type="button" onclick="openQuickView(<?= (int)$product['id'] ?>, event)" class="pointer-events-auto bg-brand-bg/95 hover:bg-brand-bg text-brand-text text-[10px] font-bold uppercase tracking-widest py-2.5 px-5 rounded shadow-lg transition-all translate-y-3 group-hover:translate-y-0 duration-300">
+                                    Quick View
+                                </button>
+                            </div>
+                        </div>
                         <?php if (!empty($product['brand'])): ?>
                             <span class="brand" style="margin-bottom: 4px; font-size: 11px; text-transform: uppercase; color: var(--color-gray);"><?= htmlspecialchars($product['brand']) ?></span>
                         <?php endif; ?>

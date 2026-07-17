@@ -107,6 +107,14 @@ function route_public(string $uri, string $method): void
             }
             break;
 
+        case $uri === '/customer/orders':
+            if (!is_logged_in()) {
+                $_SESSION['_flash']['error'] = 'Please login first';
+                redirect('/login');
+            }
+            render('customer/orders');
+            break;
+
         case $uri === '/customer/addresses':
             if (!is_logged_in()) {
                 $_SESSION['_flash']['error'] = 'Please login first';

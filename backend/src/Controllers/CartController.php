@@ -104,4 +104,18 @@ class CartController
 
         Response::json(['message' => 'Item removed from cart']);
     }
+
+    public function clear(): void
+    {
+        $cartId = $this->resolveCartId();
+
+        if (!$cartId) {
+            Response::error('customer_id or session_id is required');
+            return;
+        }
+
+        Cart::clear($cartId);
+
+        Response::json(['message' => 'Cart cleared']);
+    }
 }
