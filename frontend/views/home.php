@@ -2,13 +2,9 @@
 function getCategoryImage(string $name): string {
     $name = strtolower(trim($name));
     $map = [
-        'linen'       => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1093,c_limit/6e13f4e5-6b87-4687-b3b0-c1bb14ebbb75/nike-just-do-it.jpg',
-        'cotton'      => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1093,c_limit/6e13f4e5-6b87-4687-b3b0-c1bb14ebbb75/nike-just-do-it.jpg',
-        'silk'        => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1093,c_limit/6e13f4e5-6b87-4687-b3b0-c1bb14ebbb75/nike-just-do-it.jpg',
-        'men'         => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1093,c_limit/6e13f4e5-6b87-4687-b3b0-c1bb14ebbb75/nike-just-do-it.jpg',
-        'women'       => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1093,c_limit/6e13f4e5-6b87-4687-b3b0-c1bb14ebbb75/nike-just-do-it.jpg',
         'shoes'       => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1198,c_limit/f5100f5d-1df6-4558-b407-701bbbfc571f/nike-just-do-it.jpg',
-        'accessories' => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_1093,c_limit/6e13f4e5-6b87-4687-b3b0-c1bb14ebbb75/nike-just-do-it.jpgp',
+        'T-Shirt'     => 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_658,c_limit/e78ce8ec-bf9b-4b1c-acc4-a852f660aee8/nike-just-do-it.jpg',
+
     ];
     
     foreach ($map as $key => $url) {
@@ -16,8 +12,7 @@ function getCategoryImage(string $name): string {
             return $url;
         }
     }
-    
-    return 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?q=80&w=600&auto=format&fit=crop';
+    return 'https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/h_658,c_limit/e78ce8ec-bf9b-4b1c-acc4-a852f660aee8/nike-just-do-it.jpg';
 }
 ?>
 
