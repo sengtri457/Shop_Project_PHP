@@ -18,6 +18,7 @@ use App\Controllers\DiscountController;
 use App\Controllers\SupplierController;
 use App\Controllers\PurchaseOrderController;
 use App\Controllers\ProductReviewController;
+use App\Controllers\PaymentController;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -45,8 +46,9 @@ $router->patch('/categories/{id}', [CategoryController::class, 'update']);
 $router->delete('/categories/{id}',[CategoryController::class, 'destroy']);
 
 // ---- Products ----
-$router->get('/products',       [ProductController::class, 'index']);
-$router->get('/products/{id}',  [ProductController::class, 'show']);
+$router->get('/products',             [ProductController::class, 'index']);
+$router->get('/products/best-sellers', [ProductController::class, 'bestSellers']);
+$router->get('/products/{id}',        [ProductController::class, 'show']);
 $router->post('/products',      [ProductController::class, 'store']);
 $router->put('/products/{id}',  [ProductController::class, 'update']);
 $router->patch('/products/{id}',[ProductController::class, 'update']);
@@ -65,6 +67,11 @@ $router->post('/orders',           [OrderController::class, 'store']);
 $router->get('/orders/{id}',       [OrderController::class, 'show']);
 $router->patch('/orders/{id}/status', [OrderController::class, 'updateStatus']);
 $router->get('/admin/stats', [OrderController::class, 'adminStats']);
+
+// ---- Payments (Bakong KHQR) ----
+$router->get('/payments/bakong/config',    [PaymentController::class, 'config']);
+$router->post('/payments/bakong/generate', [PaymentController::class, 'generateBakongQr']);
+$router->post('/payments/bakong/check',    [PaymentController::class, 'checkBakongStatus']);
 
 // ---- Suppliers ----
 $router->get('/suppliers',             [SupplierController::class, 'index']);

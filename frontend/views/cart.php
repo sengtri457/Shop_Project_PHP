@@ -4,13 +4,21 @@ $cart = $result['data'] ?? [];
 $items = $cart['items'] ?? [];
 ?>
 
-<div class="section" style="max-width: 800px; margin: 0 auto;">
+<div class="section px-4 sm:px-6" style="max-width: 800px; margin: 0 auto;">
     <h1 style="font-family: var(--font-serif); font-size: 2.5rem; font-weight: 500; margin-bottom: 40px; text-align: center; border-bottom: 1px solid var(--color-gray-light); padding-bottom: 20px;">Shopping Bag</h1>
 
     <?php if (empty($items)): ?>
-        <div style="text-align: center; padding: 40px 0;">
-            <p style="color: var(--color-gray); font-size: 1.1rem; margin-bottom: 24px;">Your bag is currently empty.</p>
-            <a href="/products" class="btn btn-primary">Browse Essentials</a>
+        <div class="text-center py-20 bg-brand-darker rounded-brand border border-brand-border flex flex-col items-center justify-center p-6 my-8">
+            <div class="w-12 h-12 rounded-full bg-brand-accentLight text-brand-accent flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+            </div>
+            <h3 class="font-sans text-[16px] font-semibold text-brand-text mb-1">Your shopping bag is empty</h3>
+            <p class="text-[12.5px] text-brand-muted mb-6 max-w-xs leading-relaxed">Discover our curated collection of essentials designed for everyday comfort and style.</p>
+            <a href="/products" class="inline-block bg-brand-text text-brand-bg text-[11px] font-bold uppercase tracking-widest py-3.5 px-8 rounded hover:bg-brand-accent transition-all">
+                Explore Collection
+            </a>
         </div>
     <?php else: ?>
         <div class="cart-items" style="display: flex; flex-direction: column; gap: 0; margin-bottom: 40px;">

@@ -65,6 +65,9 @@
             stroke: currentColor !important;
         }
     </style>
+    <script>
+        const API_BASE = '<?= API_BASE ?>';
+    </script>
 </head>
 <body class="bg-brand-bg text-brand-text font-sans antialiased">
     <!-- Top Progress Loading Bar -->
@@ -93,8 +96,8 @@
     $isAdminRoute = is_admin() && (strpos($currentUri, '/admin') === 0);
     if (!$isAdminRoute): 
     ?>
-    <nav class="sticky top-0 z-50 bg-brand-bg/95 backdrop-blur-md border-b border-brand-border py-6 transition-all duration-300">
-        <div class="max-w-[1280px] mx-auto px-8 flex justify-around items-center static">
+    <nav class="sticky top-0 z-50 bg-brand-bg/95 backdrop-blur-md border-b border-brand-border py-3.5 transition-all duration-300">
+        <div class="max-w-[1280px] mx-auto px-6 flex justify-around items-center static">
             <a href="/" class="flex items-center">
                 <img src="/assets/images/logoDevs.png" alt="Logo" class="h-10 w-auto">
             </a>
@@ -340,7 +343,7 @@
     }
     </script>
 
-    <main class="max-w-[1280px] mx-auto px-8 pt-8 pb-24 min-h-[calc(100vh-200px)]">
+    <main class="w-full max-w-[1280px] mx-auto min-h-[calc(100vh-200px)]">
     <?php if ($isAdminRoute): ?>
         <!-- Mobile Admin Top Bar Header -->
         <div class="lg:hidden w-full bg-brand-darker border-b border-brand-border py-4 px-6 flex justify-between items-center sticky top-0 z-[100]">
@@ -1179,5 +1182,5 @@
             });
         }
         </script>
-        <main class="max-w-[1280px] mx-auto px-8 pb-24 min-h-[calc(100vh-200px)]">
+        <main class="w-full max-w-[1280px] mx-auto min-h-[calc(100vh-200px)]">
     <?php endif; ?>

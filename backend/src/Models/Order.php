@@ -50,7 +50,7 @@ class Order
     {
         $db = Database::getConnection();
         $stmt = $db->prepare("
-            SELECT oi.*, pv.sku, pv.attributes, pv.image_url, p.name as product_name
+            SELECT oi.*, pv.sku, pv.attributes, pv.image_url as variant_image, p.name as product_name, p.images as product_images
             FROM order_items oi
             JOIN product_variants pv ON oi.variant_id = pv.id
             JOIN products p ON pv.product_id = p.id
@@ -75,7 +75,7 @@ class Order
         return $stmt->fetchAll();
     }
 
-    public static function create(int $customerId, array $items, int $addressId, ?array $discountData = null): int
+    public static function create(int $customerId, array $items, int $addressId, ?array $discountData = null, string $paymentMethod = 'cod'): int
     {
         $db = Database::getConnection();
         $db->beginTransaction();
@@ -127,14 +127,15 @@ class Order
 
             $stmt = $db->prepare("
                 INSERT INTO orders (
-                    customer_id, status, total,
+                    customer_id, status, total, payment_method, payment_status,
                     shipping_line1, shipping_line2, shipping_city,
                     shipping_postal_code, shipping_country, shipping_phone
-                ) VALUES (?, 'pending', ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, 'pending', ?, ?, 'unpaid', ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $customerId,
                 $total,
+                $paymentMethod,
                 $address['line1'],
                 $address['line2'] ?? null,
                 $address['city'],
@@ -178,5 +179,32 @@ class Order
         $db = Database::getConnection();
         $stmt = $db->prepare("UPDATE orders SET status = ? WHERE id = ?");
         $stmt->execute([$status, $id]);
+    }
+
+    public static function updatePaymentStatus(int $id, string $paymentStatus, ?string $orderStatus = null, ?string $bakongMd5 = null, ?string $paymentMethod = null): void
+    {
+        $db = Database::getConnection();
+        $updates = ["payment_status = ?"];
+        $params = [$paymentStatus];
+
+        if ($orderStatus !== null) {
+            $updates[] = "status = ?";
+            $params[] = $orderStatus;
+        }
+
+        if ($bakongMd5 !== null) {
+            $updates[] = "bakong_md5 = ?";
+            $params[] = $bakongMd5;
+        }
+
+        if ($paymentMethod !== null) {
+            $updates[] = "payment_method = ?";
+            $params[] = $paymentMethod;
+        }
+
+        $params[] = $id;
+        $sql = "UPDATE orders SET " . implode(", ", $updates) . " WHERE id = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
     }
 }

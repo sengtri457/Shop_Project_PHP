@@ -232,4 +232,59 @@ class Product
             $stmt->execute([$productId, (int) $tid]);
         }
     }
+
+    public static function bestSellers(int $limit = 10): array
+    {
+        $db = Database::getConnection();
+        
+        // Fetch top selling products based on actual completed/placed orders
+        $stmt = $db->prepare("
+            SELECT p.id, p.name, p.description, p.base_price, p.discount_percent, p.images, p.brand, p.gender, p.created_at,
+                   CAST(SUM(oi.quantity) AS UNSIGNED) as total_sold
+            FROM order_items oi
+            JOIN orders o ON oi.order_id = o.id
+            JOIN product_variants pv ON oi.variant_id = pv.id
+            JOIN products p ON pv.product_id = p.id
+            WHERE o.status != 'cancelled' AND p.is_active = 1
+            GROUP BY p.id, p.name, p.description, p.base_price, p.discount_percent, p.images, p.brand, p.gender, p.created_at
+            ORDER BY total_sold DESC
+            LIMIT ?
+        ");
+        $stmt->bindValue(1, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        $orderedProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $foundIds = array_column($orderedProducts, 'id');
+        
+        // If fewer products have order history than requested limit, append active catalog products
+        if (count($orderedProducts) < $limit) {
+            $needed = $limit - count($orderedProducts);
+            $whereNotIn = '';
+            $params = [];
+            if (!empty($foundIds)) {
+                $placeholders = implode(',', array_fill(0, count($foundIds), '?'));
+                $whereNotIn = " AND p.id NOT IN ($placeholders)";
+                $params = $foundIds;
+            }
+            
+            $sql = "SELECT p.id, p.name, p.description, p.base_price, p.discount_percent, p.images, p.brand, p.gender, p.created_at, 0 as total_sold FROM products p WHERE p.is_active = 1 {$whereNotIn} ORDER BY p.id DESC LIMIT ?";
+            $fillStmt = $db->prepare($sql);
+            
+            $i = 1;
+            foreach ($params as $paramId) {
+                $fillStmt->bindValue($i++, $paramId, PDO::PARAM_INT);
+            }
+            $fillStmt->bindValue($i, $needed, PDO::PARAM_INT);
+            $fillStmt->execute();
+            
+            $additionalProducts = $fillStmt->fetchAll(PDO::FETCH_ASSOC);
+            $orderedProducts = array_merge($orderedProducts, $additionalProducts);
+        }
+        
+        // Attach variants
+        return array_map(function ($product) {
+            $product['variants'] = self::variants((int) $product['id']);
+            return $product;
+        }, $orderedProducts);
+    }
 }

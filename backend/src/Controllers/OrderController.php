@@ -40,6 +40,7 @@ class OrderController
         $items      = $body['items'] ?? [];
         $addressId  = (int) ($body['address_id'] ?? 0);
         $discount   = $body['discount'] ?? null;
+        $paymentMethod = $body['payment_method'] ?? 'cod';
 
         if (!$customerId || empty($items) || !$addressId) {
             Response::error('customer_id, items, and address_id are required');
@@ -47,7 +48,7 @@ class OrderController
         }
 
         try {
-            $orderId = Order::create($customerId, $items, $addressId, $discount);
+            $orderId = Order::create($customerId, $items, $addressId, $discount, $paymentMethod);
             $order = Order::find($orderId);
             $order['items']     = Order::items($orderId);
             $order['discounts'] = Order::discounts($orderId);

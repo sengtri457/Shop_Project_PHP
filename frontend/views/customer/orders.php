@@ -5,137 +5,144 @@ if (!is_logged_in()) {
     return;
 }
 
-$customerId = $_SESSION['customer']['id'];
+$customerId = (int) $_SESSION['customer']['id'];
 $ordersResult = api_get('/orders?customer_id=' . $customerId);
 $orders = $ordersResult['data'] ?? [];
 
-// Helper to get HSL colors for order statuses
-function getStatusBadgeStyle(string $status): string
+function getOrderStatusBadgeClass(string $status): string
 {
-    $status = strtolower($status);
-    switch ($status) {
-        case 'pending':
-            return 'background: #fef3c7; color: #d97706;'; // Amber/Gold
+    switch (strtolower($status)) {
+        case 'pending': return 'bg-amber-50 text-amber-700 border-amber-200';
         case 'confirmed':
-        case 'processing':
-            return 'background: #e0f2fe; color: #0284c7;'; // Sky Blue
-        case 'shipped':
-            return 'background: #e0e7ff; color: #4f46e5;'; // Indigo
-        case 'delivered':
-            return 'background: #dcfce7; color: #16a34a;'; // Emerald Green
-        case 'cancelled':
-            return 'background: #ffeeeb; color: #b91c1c;'; // Terracotta Red
-        default:
-            return 'background: #f3f4f6; color: #4b5563;'; // Grey
+        case 'processing': return 'bg-sky-50 text-sky-700 border-sky-200';
+        case 'shipped': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+        case 'delivered': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        case 'cancelled': return 'bg-rose-50 text-rose-700 border-rose-200';
+        default: return 'bg-gray-50 text-gray-700 border-gray-200';
     }
 }
 ?>
 
-<div class="max-w-[1280px] mx-auto px-8 pt-12 pb-24">
+<div class="max-w-[1280px] mx-auto px-6 md:px-8 py-12">
     <div class="mb-10 text-center">
-        <h1 class="font-serif text-[2.3rem] font-medium text-brand-text mb-2">My Orders</h1>
-        <p class="text-[13px] text-brand-muted">Track status, view invoices, and browse order history.</p>
+        <h1 class="font-serif text-3xl md:text-4xl font-semibold text-brand-text mb-2">My Orders</h1>
+        <p class="text-xs text-brand-muted">Track order status, view items, and manage order history.</p>
     </div>
 
     <?php if (empty($orders)): ?>
-        <div class="text-center py-20 bg-brand-darker rounded-brand border border-brand-border flex flex-col items-center justify-center p-6">
-            <div class="w-12 h-12 rounded-full bg-brand-accentLight text-brand-accent flex items-center justify-center mb-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                </svg>
+        <div class="text-center py-20 bg-white rounded-lg border border-brand-border flex flex-col items-center justify-center p-8 max-w-lg mx-auto shadow-sm">
+            <div class="w-14 h-14 rounded-full bg-brand-darker text-brand-muted flex items-center justify-center mb-4 text-xl">
+                <i class="fa-solid fa-box-open"></i>
             </div>
-            <h3 class="font-sans text-[15px] font-semibold text-brand-text mb-1">No orders yet</h3>
-            <p class="text-[12px] text-brand-muted mb-6 max-w-xs leading-relaxed">You haven't placed any orders yet. Explore our latest arrivals to get started!</p>
-            <a href="/products" class="inline-block bg-brand-text text-brand-bg text-[11px] font-bold uppercase tracking-widest py-3 px-6 rounded hover:bg-brand-text/95 transition-all">
-                Shop Our Collection
+            <h3 class="font-serif text-lg font-semibold text-brand-text mb-1">No Orders Yet</h3>
+            <p class="text-xs text-brand-muted mb-6 leading-relaxed max-w-xs">
+                You haven't placed any orders yet. Discover our latest collections and start shopping!
+            </p>
+            <a href="/products" class="inline-block bg-brand-text text-white text-xs font-bold uppercase tracking-widest py-3 px-8 rounded hover:bg-brand-text/90 transition-all shadow-sm">
+                Shop Collection
             </a>
         </div>
     <?php else: ?>
-        <div style="display: flex; flex-direction: column; gap: 30px;">
+        <div class="space-y-6 max-w-4xl mx-auto">
             <?php foreach ($orders as $order): 
-                $orderId = $order['id'];
+                $orderId = (int) $order['id'];
                 
-                // Fetch full order details including items
+                // Fetch full order details
                 $detailResult = api_get("/orders/$orderId");
                 $orderDetails = $detailResult['data'] ?? $order;
                 $items = $orderDetails['items'] ?? [];
                 $discounts = $orderDetails['discounts'] ?? [];
-                
                 $orderDate = date('F d, Y', strtotime($order['created_at']));
+                $status = strtolower($order['status'] ?? 'pending');
             ?>
-                <div style="background: #fff; border: 1px solid var(--color-gray-light); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow-soft);">
-                    <!-- Header of the Card -->
-                    <div style="background: var(--color-gray-bg); padding: 20px 24px; border-b: 1px solid var(--color-gray-light); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: center;">
-                        <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+                <div class="bg-white border border-brand-border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <!-- Top Bar Header -->
+                    <div class="bg-brand-bg px-6 py-4 border-b border-brand-border flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center gap-6 flex-wrap text-xs">
                             <div>
-                                <p style="font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--color-gray); margin-bottom: 4px;">Order Placed</p>
-                                <p style="font-size: 13.5px; font-weight: 500; color: var(--color-black);"><?= $orderDate ?></p>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-brand-muted block">Order Placed</span>
+                                <span class="font-medium text-brand-text"><?= $orderDate ?></span>
                             </div>
                             <div>
-                                <p style="font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--color-gray); margin-bottom: 4px;">Total Amount</p>
-                                <p style="font-size: 13.5px; font-weight: 600; color: var(--color-black);">$<?= number_format($order['total'], 2) ?></p>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-brand-muted block">Total Amount</span>
+                                <span class="font-bold text-brand-text">$<?= number_format((float)($order['total'] ?? 0), 2) ?></span>
                             </div>
                             <div>
-                                <p style="font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--color-gray); margin-bottom: 4px;">Ship To</p>
-                                <p style="font-size: 13.5px; font-weight: 500; color: var(--color-black);" title="<?= htmlspecialchars($order['shipping_line1'] . ', ' . $order['shipping_city']) ?>">
-                                    <?= htmlspecialchars($order['shipping_city']) ?>, <?= htmlspecialchars($order['shipping_country']) ?>
-                                </p>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-brand-muted block">Ship To</span>
+                                <span class="font-medium text-brand-text" title="<?= htmlspecialchars(($order['shipping_line1'] ?? '') . ', ' . ($order['shipping_city'] ?? '')) ?>">
+                                    <?= htmlspecialchars((string)($order['shipping_city'] ?? '')) ?>, <?= htmlspecialchars((string)($order['shipping_country'] ?? '')) ?>
+                                </span>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <span style="font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 9999px; text-transform: uppercase; tracking-wider: 1px; <?= getStatusBadgeStyle($order['status']) ?>">
-                                <?= htmlspecialchars($order['status']) ?>
+
+                        <div class="flex items-center gap-3">
+                            <span class="px-3 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider <?= getOrderStatusBadgeClass($status) ?>">
+                                <?= htmlspecialchars(ucfirst($status)) ?>
                             </span>
-                            <span style="font-size: 13.5px; font-weight: 500; color: var(--color-gray-dark);">Order #<?= $orderId ?></span>
+                            <span class="text-xs font-bold text-brand-text">#<?= $orderId ?></span>
                         </div>
                     </div>
 
-                    <!-- Items List -->
-                    <div style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Items Body -->
+                    <div class="p-6 divide-y divide-brand-border">
                         <?php foreach ($items as $item): 
-                            $prodImages = split_image_urls($item['product_images'] ?? '');
-                            $itemImg = !empty($prodImages) ? asset_url($prodImages[0]) : '/assets/images/hero_banner.png';
+                            $variantImg = !empty($item['variant_image']) ? $item['variant_image'] : (!empty($item['image_url']) ? $item['image_url'] : null);
+                            if ($variantImg) {
+                                $itemImg = asset_url($variantImg);
+                            } else {
+                                $prodImages = split_image_urls($item['product_images'] ?? $item['images'] ?? '');
+                                $itemImg = !empty($prodImages) ? asset_url($prodImages[0]) : '/assets/images/hero_banner.png';
+                            }
+                            $attrs = !empty($item['attributes']) ? json_decode($item['attributes'], true) : null;
                         ?>
-                            <div style="display: flex; gap: 20px; align-items: center;">
-                                <div style="width: 70px; height: 90px; border-radius: var(--border-radius); border: 1px solid var(--color-gray-light); overflow: hidden; flex-shrink: 0; background: var(--color-gray-bg);">
-                                    <img src="<?= htmlspecialchars($itemImg) ?>" alt="<?= htmlspecialchars($item['product_name']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div class="py-4 first:pt-0 last:pb-0 flex items-center gap-4">
+                                <div class="w-16 h-20 bg-brand-darker border border-brand-border rounded overflow-hidden flex-shrink-0">
+                                    <img src="<?= htmlspecialchars((string)$itemImg) ?>" class="w-full h-full object-cover" alt="<?= htmlspecialchars((string)($item['product_name'] ?? 'Product')) ?>">
                                 </div>
-                                <div style="flex: 1;">
-                                    <h4 style="font-size: 14.5px; font-weight: 600; color: var(--color-black); margin-bottom: 4px;"><?= htmlspecialchars($item['product_name']) ?></h4>
-                                    <p style="font-size: 12px; color: var(--color-gray-dark); margin-bottom: 2px;">
-                                        SKU: <span style="font-weight: 500;"><?= htmlspecialchars($item['sku'] ?? 'N/A') ?></span>
-                                        <?php if (!empty($item['attributes'])): ?>
-                                            | Variant: <span style="font-weight: 500;"><?= htmlspecialchars(implode(' / ', json_decode($item['attributes'], true))) ?></span>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-sans text-xs font-semibold text-brand-text truncate">
+                                        <?= htmlspecialchars((string)($item['product_name'] ?? 'Item')) ?>
+                                    </h4>
+                                    <div class="text-[11px] text-brand-muted mt-0.5 space-y-0.5">
+                                        <?php if (!empty($item['sku'])): ?>
+                                            <p>SKU: <span class="font-medium text-brand-text"><?= htmlspecialchars((string)$item['sku']) ?></span></p>
                                         <?php endif; ?>
+                                        <?php if ($attrs && is_array($attrs)): ?>
+                                            <p>Variant: <span class="font-medium text-brand-text"><?= htmlspecialchars(implode(' / ', $attrs)) ?></span></p>
+                                        <?php endif; ?>
+                                    </div>
+                                    <p class="text-[11px] text-brand-muted mt-1">
+                                        Quantity: <strong class="text-brand-text"><?= (int)($item['quantity'] ?? 1) ?></strong> &times; $<?= number_format((float)($item['price_at_purchase'] ?? 0), 2) ?>
                                     </p>
-                                    <p style="font-size: 13.5px; color: var(--color-gray-dark);">Qty: <span style="font-weight: 600; color: var(--color-black);"><?= $item['quantity'] ?></span> &times; $<?= number_format($item['price_at_purchase'], 2) ?></p>
                                 </div>
-                                <div style="text-align: right; font-weight: 600; font-size: 14.5px; color: var(--color-black);">
-                                    $<?= number_format($item['price_at_purchase'] * $item['quantity'], 2) ?>
+                                <div class="text-right">
+                                    <div class="text-xs font-bold text-brand-text">
+                                        $<?= number_format((float)(($item['price_at_purchase'] ?? 0) * ($item['quantity'] ?? 1)), 2) ?>
+                                    </div>
                                 </div>
                             </div>
                         <?php endforeach; ?>
-                        
-                        <!-- Applied Discounts snapshot -->
+
+                        <!-- Discounts applied -->
                         <?php if (!empty($discounts)): ?>
-                            <div style="border-top: 1px solid var(--color-gray-light); padding-top: 16px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
-                                <?php foreach ($discounts as $d): ?>
-                                    <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--color-error);">
-                                        <span style="display: flex; align-items: center; gap: 6px;">
-                                            <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a1.125 1.125 0 001.591 0l4.318-4.318a1.125 1.125 0 000-1.591l-9.581-9.581A1.125 1.125 0 009.568 3z"></path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"></path>
-                                            </svg>
-                                            Coupon applied: <strong><?= htmlspecialchars($d['code']) ?></strong>
-                                        </span>
-                                        <span>-$<?= number_format($d['amount_saved'], 2) ?></span>
-                                    </div>
-                                <?php endforeach; ?>
+                            <div class="pt-3 mt-3 text-xs text-emerald-700 flex items-center justify-between font-medium">
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-tag text-emerald-600"></i> Coupon Applied
+                                </span>
+                                <span>-$<?= number_format((float)($discounts[0]['amount_saved'] ?? 0), 2) ?></span>
                             </div>
                         <?php endif; ?>
+                    </div>
+
+                    <!-- Footer Details Link -->
+                    <div class="px-6 py-3 bg-brand-bg/50 border-t border-brand-border flex justify-end">
+                        <a href="/orders/<?= $orderId ?>" class="text-[11px] font-bold uppercase tracking-wider text-brand-text hover:text-brand-accent transition-colors flex items-center gap-1">
+                            View Order Details <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                        </a>
                     </div>
                 </div>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
 </div>
+

@@ -73,27 +73,27 @@ if (!$product):
         ];
     }
 ?>
-<div class="section">
-    <a href="/products" class="btn btn-small" style="margin-bottom: 30px;">&larr; Back to Shop</a>
+<div class="section px-4 sm:px-6">
+    <a href="/products" class="btn btn-small" style="margin-bottom: 20px;">&larr; Back to Shop</a>
 
-    <div class="product-detail" style="grid-template-columns: 1.2fr 1fr; gap: 50px;">
+    <div class="product-detail" style="grid-template-columns: 1.2fr 1fr; gap: 32px;">
         
         <!-- LEFT COLUMN: Image Gallery -->
-        <div class="product-gallery" style="display: flex; gap: 16px; align-items: flex-start;">
+        <div class="product-gallery" style="display: flex; gap: 12px; align-items: flex-start;">
             <!-- Vertical Thumbnail List -->
-            <div class="thumbnail-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 500px; overflow-y: auto; width: 80px; flex-shrink: 0;">
+            <div class="thumbnail-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto; width: 70px; flex-shrink: 0;">
                 <?php foreach ($galleryImages as $index => $imgUrl): ?>
                     <img src="<?= htmlspecialchars($imgUrl) ?>" 
                          alt="Thumbnail <?= $index + 1 ?>" 
                          onclick="switchMainImage(<?= $index ?>)" 
                          class="thumb-img"
-                         style="width: 100%; height: 95px; object-fit: cover; border-radius: 4px; border: 2px solid <?= $index === 0 ? 'var(--color-text-main)' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;"
+                         style="width: 100%; height: 80px; object-fit: cover; border-radius: 4px; border: 2px solid <?= $index === 0 ? 'var(--color-text-main)' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;"
                          data-index="<?= $index ?>">
                 <?php endforeach; ?>
             </div>
 
             <!-- Main Active Image Viewer -->
-            <div class="main-image-container" style="position: relative; flex: 1; height: 500px; background: var(--color-gray-bg); border-radius: var(--border-radius); border: 1px solid var(--color-gray-light); overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <div class="main-image-container" style="position: relative; flex: 1; height: 420px; background: var(--color-gray-bg); border-radius: var(--border-radius); border: 1px solid var(--color-gray-light); overflow: hidden; display: flex; align-items: center; justify-content: center;">
                 <img id="main-product-image" 
                      src="<?= htmlspecialchars($galleryImages[0]) ?>" 
                      alt="<?= htmlspecialchars($product['name']) ?>" 
@@ -699,4 +699,18 @@ if (selectedColor) {
     updateSelectedVariant();
 }
 </script>
+
+<!-- Mobile Sticky Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 right-0 bg-brand-bg/95 backdrop-blur-md border-t border-brand-border p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] z-40 md:hidden flex items-center justify-between gap-4">
+    <div class="flex flex-col min-w-0">
+        <span class="font-serif text-sm font-semibold text-brand-text truncate"><?= htmlspecialchars($product['name']) ?></span>
+        <span id="mobile-sticky-price" class="text-xs font-bold text-brand-accent">
+            $<?= number_format((float)($product['base_price'] ?? 0), 2) ?>
+        </span>
+    </div>
+    <button type="button" onclick="document.getElementById('add-to-cart-btn') ? document.getElementById('add-to-cart-btn').click() : null" class="px-6 py-3 bg-brand-text text-brand-bg hover:bg-brand-accent rounded-brand text-[11px] font-bold uppercase tracking-wider transition-colors shrink-0">
+        Add to Bag
+    </button>
+</div>
+
 <?php endif; ?>

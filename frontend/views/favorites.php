@@ -12,7 +12,7 @@ if (!empty($favIds)) {
 }
 ?>
 
-<div class="max-w-[1280px] mx-auto px-8 pt-12 pb-24">
+<div class="max-w-[1280px] mx-auto px-4 sm:px-6 py-6">
     <div class="mb-10 text-center">
         <h1 class="font-serif text-[2rem] font-medium text-brand-text mb-2">My Favorites</h1>
         <p class="text-[12.5px] text-brand-muted">Your curated list of pieces you love.</p>
