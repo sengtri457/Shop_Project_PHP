@@ -57,8 +57,6 @@ function getColorHex(string $colorName): string {
 }
 </style>
 
-<div class="w-full max-w-full overflow-x-hidden">
-
 <div class="flex items-center justify-start py-12 px-6 sm:px-12 bg-brand-darker bg-no-repeat bg-cover bg-center rounded-brand mb-10 mx-4 sm:mx-6 min-h-[380px] border border-brand-border" style="background-image: linear-gradient(to right, rgba(250,250,248,0.92) 35%, rgba(7, 196, 189, 0.1) 100%), url('https://static.nike.com/a/images/f_auto/dpr_1.2,cs_srgb/w_1600,c_limit/ec45aa51-06a0-40ef-9e5b-acefe2b618bf/nike-just-do-it.jpg');">
     <div class="max-w-[500px] flex flex-col items-start">
         <h1 class="font-serif text-[2.2rem] sm:text-[2.6rem] font-medium leading-[1.15] mb-3 text-brand-text">
@@ -414,11 +412,7 @@ function scrollBestSellers(dir) {
 
 <!-- Latest In Clothing Category Bar -->
 <div class="px-4 sm:px-6 mb-12">
-    <div class="text-center mb-8">
-        <h2 class="font-sans text-[2.2rem] sm:text-[3rem] font-black uppercase tracking-tight text-brand-text leading-none">
-            Latest in Clothing
-        </h2>
-    </div>
+    <h2 class="font-serif text-[1.6rem] font-medium mb-6 text-left relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-10 after:h-[2px] after:bg-brand-accent">Latest in Clothing</h2>
 
     <!-- Category Items Grid -->
     <div class="flex items-start justify-start md:justify-center gap-4 sm:gap-8 overflow-x-auto scrollbar-none py-2 px-1">
@@ -484,6 +478,80 @@ function scrollBestSellers(dir) {
     </div>
 </div>
 
+<!-- Sticky Editorial Campaign Section -->
+<div class="px-4 sm:px-6 mb-16 mt-16 max-w-[1280px] mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- LEFT COLUMN: Guides & Styling (Col 1-4) -->
+        <div class="lg:col-span-4 space-y-6">
+            <!-- Card 1: Samba Size Guide -->
+            <div class="bg-brand-bg border border-brand-border/60 rounded-brand overflow-hidden group hover:shadow-soft transition-all duration-300">
+                <div class="w-full aspect-[3/2] overflow-hidden bg-brand-darker relative border-b border-brand-border/40">
+                    <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=800&auto=format&fit=crop&q=80" alt="Samba Size Guide" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                </div>
+                <div class="p-5">
+                    <h3 class="font-serif text-base font-semibold text-brand-text mb-2">The adidas Samba Size Guide</h3>
+                    <p class="text-xs text-brand-muted leading-relaxed font-light">Tired of asking are Sambas true to size? Check out our official adidas Samba size chart for all you need to find your perfect Samba style and fit today.</p>
+                </div>
+            </div>
+
+            <!-- Card 2: How To Style A Soccer Jersey -->
+            <div class="bg-brand-bg border border-brand-border/60 rounded-brand overflow-hidden group hover:shadow-soft transition-all duration-300">
+                <div class="w-full aspect-[3/2] overflow-hidden bg-brand-darker relative border-b border-brand-border/40">
+                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&auto=format&fit=crop&q=80" alt="Soccer Jersey Styling" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                </div>
+                <div class="p-5">
+                    <h3 class="font-serif text-base font-semibold text-brand-text mb-2">How To Style A Soccer Jersey</h3>
+                    <p class="text-xs text-brand-muted leading-relaxed font-light">From sporty to flirty to polished, the soccer jersey is a versatile wardrobe hero. Get inspired on how to style a jersey in five unique and modern ways.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MIDDLE COLUMN: Sticky Promo Campaign (Col 5-8) -->
+        <div class="lg:col-span-4 lg:sticky lg:top-28 self-start bg-brand-darker/50 border border-brand-border/60 rounded-brand p-8 text-center flex flex-col items-center justify-center min-h-[320px] shadow-sm">
+            <span class="text-[10px] font-bold tracking-widest text-brand-accent uppercase block mb-3">Limited Promotion</span>
+            
+            <div class="border-t border-b border-brand-border/60 py-6 w-full my-2 space-y-3">
+                <h2 class="font-serif text-2xl font-bold tracking-tight text-brand-text leading-tight">SAVE 30% IN THE APP</h2>
+                <h4 class="font-sans text-xs font-bold tracking-widest text-brand-text/80 uppercase">2 GRAPHIC TEES FOR $30</h4>
+            </div>
+
+            <p class="text-[11.5px] text-brand-muted leading-relaxed font-light mt-4 mb-5 max-w-sm">
+                Limited time offer valid September 23, 2025 12:01am PST through September 28, 2025 11:59pm PST. adiClub members receive 30% off eligible full price and sale products* in the adidas app with promo code ADICLUB at checkout online. Offer is only valid in the adidas app. Members must be signed in to their account at the time of purchase for the discount to apply online. Offer not valid at adidas Retail stores.
+            </p>
+
+            <a href="/products" class="inline-block px-6 py-2.5 bg-brand-text hover:bg-brand-accent text-white text-[10px] font-bold uppercase tracking-widest rounded transition-colors shadow-sm">
+                Shop the App Offer
+            </a>
+        </div>
+
+        <!-- RIGHT COLUMN: Samba & Custom Blocks (Col 9-12) -->
+        <div class="lg:col-span-4 space-y-6">
+            <!-- Card 1: Samba Size Guide 2 -->
+            <div class="bg-brand-bg border border-brand-border/60 rounded-brand overflow-hidden group hover:shadow-soft transition-all duration-300">
+                <div class="w-full aspect-[3/2] overflow-hidden bg-brand-darker relative border-b border-brand-border/40">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop&q=80" alt="Samba Size Guide 2" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                </div>
+                <div class="p-5">
+                    <h3 class="font-serif text-base font-semibold text-brand-text mb-2">The adidas Samba Size Guide</h3>
+                    <p class="text-xs text-brand-muted leading-relaxed font-light">Tired of asking are Sambas true to size? Check out our official adidas Samba size chart for all you need to find your perfect Samba style and fit today.</p>
+                </div>
+            </div>
+
+            <!-- Card 2: Arsenal Jersey (Using Existing Local Image) -->
+            <div class="bg-brand-bg border border-brand-border/60 rounded-brand overflow-hidden group hover:shadow-soft transition-all duration-300">
+                <div class="w-full aspect-[3/2] overflow-hidden bg-brand-darker relative border-b border-brand-border/40">
+                    <img src="<?= asset_url('/assets/images/nike-football.avif') ?>" alt="Arsenal Custom Block" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                </div>
+                <div class="p-5">
+                    <h3 class="font-serif text-base font-semibold text-brand-text mb-2">Custom Blocks & Badges</h3>
+                    <p class="text-xs text-brand-muted leading-relaxed font-light">Elevate your store layout with interactive custom blocks, promotional badges, stickers, and seamless product quick views designed for modern e-commerce.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
 
 

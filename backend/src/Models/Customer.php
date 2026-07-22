@@ -16,6 +16,16 @@ class Customer
         return $customer ?: null;
     }
 
+    public static function findByGoogleId(string $googleId): ?array
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare("SELECT id, name, email, is_admin, created_at FROM customers WHERE google_id = ?");
+        $stmt->execute([$googleId]);
+        $customer = $stmt->fetch();
+
+        return $customer ?: null;
+    }
+
     public static function find(int $id): ?array
     {
         $db = Database::getConnection();
@@ -26,13 +36,18 @@ class Customer
         return $customer ?: null;
     }
 
-    public static function create(string $name, string $email, string $password): int
+    public static function create(string $name, string $email, string $password, ?string $googleId = null): int
     {
         $db = Database::getConnection();
-        $hash = password_hash($password, PASSWORD_DEFAULT);
 
-        $stmt = $db->prepare("INSERT INTO customers (name, email, password_hash) VALUES (?, ?, ?)");
-        $stmt->execute([$name, $email, $hash]);
+        if ($googleId) {
+            $stmt = $db->prepare("INSERT INTO customers (name, email, password_hash, google_id) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$name, $email, $password, $googleId]);
+        } else {
+            $hash = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $db->prepare("INSERT INTO customers (name, email, password_hash) VALUES (?, ?, ?)");
+            $stmt->execute([$name, $email, $hash]);
+        }
 
         return (int) $db->lastInsertId();
     }
@@ -75,5 +90,12 @@ class Customer
         $sql = "UPDATE customers SET " . implode(', ', $fields) . " WHERE id = ?";
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
+    }
+
+    public static function updateGoogleId(int $id, string $googleId): void
+    {
+        $db = Database::getConnection();
+        $stmt = $db->prepare("UPDATE customers SET google_id = ? WHERE id = ?");
+        $stmt->execute([$googleId, $id]);
     }
 }

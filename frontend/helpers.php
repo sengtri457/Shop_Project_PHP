@@ -162,3 +162,37 @@ function split_image_urls(string $imagesStr): array
     
     return array_filter(array_map('trim', $parts));
 }
+
+function google_client_id(): string
+{
+    $envPath = __DIR__ . '/../backend/.env';
+    if (!file_exists($envPath)) {
+        return '';
+    }
+    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos($line, 'GOOGLE_CLIENT_ID=') === 0) {
+            return trim(substr($line, strlen('GOOGLE_CLIENT_ID=')), '"\'');
+        }
+    }
+    return '';
+}
+
+function google_redirect_uri(): string
+{
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost:3000';
+    return "$scheme://$host/auth/google/callback";
+}
+
+function google_auth_url(): string
+{
+    $params = http_build_query([
+        'client_id' => google_client_id(),
+        'redirect_uri' => google_redirect_uri(),
+        'response_type' => 'code',
+        'scope' => 'email profile',
+        'access_type' => 'online',
+    ]);
+    return 'https://accounts.google.com/o/oauth2/v2/auth?' . $params;
+}

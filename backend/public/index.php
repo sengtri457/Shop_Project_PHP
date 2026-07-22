@@ -35,6 +35,7 @@ $router = new Router();
 // ---- Auth ----
 $router->post('/auth/register', [AuthController::class, 'register']);
 $router->post('/auth/login',    [AuthController::class, 'login']);
+$router->post('/auth/google',   [AuthController::class, 'googleLogin']);
 
 // ---- Categories ----
 $router->get('/categories',        [CategoryController::class, 'index']);

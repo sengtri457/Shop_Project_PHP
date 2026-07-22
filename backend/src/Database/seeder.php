@@ -35,47 +35,63 @@ $myCategories = [
 //   - A comma-separated string: '/assets/images/img1.png,/assets/images/img2.png'
 
 $myProducts = [
+    // [
+    //     'name'        => 'My Custom Hoodie',
+    //     'brand'       => 'My Brand',
+    //     'price'       => 69.99,
+    //     'discount'    => 0, // Discount percentage (e.g. 10 for 10% off)
+    //     'gender'      => 'unisex', // Options: 'men', 'women', 'kids', 'unisex'
+    //     'category'    => 'Hoodies & Sweatshirts', // Must match one of $myCategories above
+    //     'desc'        => 'Premium heavy fleece hoodie designed for everyday comfort.',
+    //     // EXAMPLE: Multiple images as an array
+    //     'img'         => [
+    //         '/assets/images/hero_banner.png',
+    //         '/assets/images/bannerMen.gif'
+    //     ],
+    //     'sizes'       => ['S', 'M', 'L', 'XL'],
+    //     'stock'       => 50
+    // ],
+    // [
+    //     'name'        => 'My Custom T-Shirt',
+    //     'brand'       => 'My Brand',
+    //     'price'       => 29.99,
+    //     'discount'    => 10,
+    //     'gender'      => 'men',
+    //     'category'    => 'Tops & Shirts',
+    //     'desc'        => 'Soft organic cotton t-shirt with modern relaxed fit.',
+    //     // EXAMPLE: Single image as a string
+    //     'img'         => '/assets/images/bannerMen.gif',
+    //     'sizes'       => ['M', 'L', 'XL'],
+    //     'stock'       => 40
+    // ],
+    // [
+    //     'name'        => 'My Custom Jacket',
+    //     'brand'       => 'My Brand',
+    //     'price'       => 129.99,
+    //     'discount'    => 15,
+    //     'gender'      => 'women',
+    //     'category'    => 'Jackets & Coats',
+    //     'desc'        => 'Weather-resistant lightweight outer jacket.',
+    //     // EXAMPLE: Multiple images as comma-separated string
+    //     'img'         => '/assets/images/BannerWomen.avif,/assets/images/hero_banner.png',
+    //     'sizes'       => ['S', 'M', 'L'],
+    //     'stock'       => 25
+    // ],
     [
-        'name'        => 'My Custom Hoodie',
-        'brand'       => 'My Brand',
-        'price'       => 69.99,
-        'discount'    => 0, // Discount percentage (e.g. 10 for 10% off)
-        'gender'      => 'unisex', // Options: 'men', 'women', 'kids', 'unisex'
-        'category'    => 'Hoodies & Sweatshirts', // Must match one of $myCategories above
-        'desc'        => 'Premium heavy fleece hoodie designed for everyday comfort.',
-        // EXAMPLE: Multiple images as an array
-        'img'         => [
-            '/assets/images/hero_banner.png',
-            '/assets/images/bannerMen.gif'
-        ],
-        'sizes'       => ['S', 'M', 'L', 'XL'],
-        'stock'       => 50
-    ],
-    [
-        'name'        => 'My Custom T-Shirt',
-        'brand'       => 'My Brand',
-        'price'       => 29.99,
-        'discount'    => 10,
+        'name'        => 'Classic Crewneck T-Shirt',
+        'brand'       => 'Nike',
+        'price'       => 19.99,
+        'discount'    => 20,
         'gender'      => 'men',
         'category'    => 'Tops & Shirts',
-        'desc'        => 'Soft organic cotton t-shirt with modern relaxed fit.',
-        // EXAMPLE: Single image as a string
-        'img'         => '/assets/images/bannerMen.gif',
-        'sizes'       => ['M', 'L', 'XL'],
-        'stock'       => 40
-    ],
-    [
-        'name'        => 'My Custom Jacket',
-        'brand'       => 'My Brand',
-        'price'       => 129.99,
-        'discount'    => 15,
-        'gender'      => 'women',
-        'category'    => 'Jackets & Coats',
-        'desc'        => 'Weather-resistant lightweight outer jacket.',
-        // EXAMPLE: Multiple images as comma-separated string
-        'img'         => '/assets/images/BannerWomen.avif,/assets/images/hero_banner.png',
-        'sizes'       => ['S', 'M', 'L'],
-        'stock'       => 25
+        'desc'        => 'Nike classic crewneck t-shirt crafted with quality materials for everyday wear.',
+        'img'         => [
+            'https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/404ae12d-aa11-4f00-b3ed-af2580f3fabf/M+NK+DF+24.7+IS+SHORT.png',
+            'https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/404ae12d-aa11-4f00-b3ed-af2580f3fabf/M+NK+DF+24.7+IS+SHORT.pngg',
+            'https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/404ae12d-aa11-4f00-b3ed-af2580f3fabf/M+NK+DF+24.7+IS+SHORT.png',
+        ],
+        'sizes'       => ['S', 'M', 'L', 'XL', 'XXL'],
+        'stock'       => 65
     ],
 ];
 

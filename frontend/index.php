@@ -147,6 +147,69 @@ function route_public(string $uri, string $method): void
             }
             break;
 
+        case $uri === '/auth/session':
+            if ($method === 'POST') {
+                $input = json_decode(file_get_contents('php://input'), true);
+                if (!empty($input['token'])) {
+                    $_SESSION['token'] = $input['token'];
+                    $_SESSION['customer'] = $input['customer'];
+                    $_SESSION['is_admin'] = !empty($input['customer']['is_admin']);
+                    http_response_code(200);
+                    echo json_encode(['status' => 'ok']);
+                } else {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Token required']);
+                }
+            } else {
+                http_response_code(405);
+            }
+            exit;
+
+        case $uri === '/auth/google/debug':
+            echo '<h2>Google OAuth Debug</h2>';
+            echo '<p><strong>Auth URL being used:</strong></p>';
+            echo '<p style="word-break:break-all;font-size:12px;background:#f5f5f5;padding:10px;border:1px solid #ddd;border-radius:4px;">' . htmlspecialchars(google_auth_url()) . '</p>';
+            echo '<p><strong>Redirect URI:</strong> <code>' . htmlspecialchars(google_redirect_uri()) . '</code></p>';
+            echo '<p><strong>Client ID:</strong> <code>' . htmlspecialchars(google_client_id()) . '</code></p>';
+            echo '<p>Copy the <strong>Redirect URI</strong> above and add it exactly to Google Cloud Console → Authorized redirect URIs, then save and try again.</p>';
+            exit;
+
+        case $uri === '/auth/google/callback':
+            $code = $_GET['code'] ?? '';
+            $error = $_GET['error'] ?? '';
+
+            if ($error) {
+                $_SESSION['_flash']['error'] = 'Google sign in was cancelled or denied.';
+                redirect('/login');
+            }
+
+            if (!$code) {
+                $_SESSION['_flash']['error'] = 'No authorization code received from Google.';
+                redirect('/login');
+            }
+
+            $result = api_post('/auth/google', [
+                'code' => $code,
+                'redirect_uri' => google_redirect_uri(),
+                'session_id' => cart_session_id(),
+            ]);
+
+            if ($result['code'] === 200 && !empty($result['data']['token'])) {
+                $_SESSION['token'] = $result['data']['token'];
+                $_SESSION['customer'] = $result['data']['customer'];
+                $_SESSION['is_admin'] = !empty($result['data']['customer']['is_admin']);
+
+                $_SESSION['_flash']['success'] = 'Welcome, ' . ($result['data']['customer']['name'] ?? '') . '!';
+
+                if (!empty($_SESSION['is_admin'])) {
+                    redirect('/admin');
+                }
+                redirect('/');
+            }
+
+            $_SESSION['_flash']['error'] = $result['data']['error'] ?? 'Google sign in failed. Please try again.';
+            redirect('/login');
+
         case $uri === '/logout':
             session_destroy();
             redirect('/');

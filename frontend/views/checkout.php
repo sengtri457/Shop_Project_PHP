@@ -241,14 +241,6 @@ if ($pendingBakongOrderId) {
         <!-- Payment Details -->
         <div class="bg-brand-bg p-3 rounded-lg text-xs space-y-1.5 mb-5 border border-brand-border">
             <div class="flex justify-between text-brand-muted">
-                <span>Merchant Name:</span>
-                <strong class="text-brand-text font-bold" id="bakong-merchant-name">SENGTREE bUN</strong>
-            </div>
-            <div class="flex justify-between text-brand-muted">
-                <span>Account ID:</span>
-                <strong class="text-brand-text font-medium" id="bakong-account-id">bun_sengtri@bkrt</strong>
-            </div>
-            <div class="flex justify-between text-brand-muted pt-1 border-t border-brand-border">
                 <span>Total Amount:</span>
                 <strong class="text-brand-accent font-extrabold text-sm"><span id="bakong-currency-symbol">$</span><span id="bakong-amount">0.00</span></strong>
             </div>
@@ -363,8 +355,6 @@ function initBakongPayment(orderId, currency = 'USD') {
             document.getElementById('bakong-qr-img').src = data.qr_image;
             document.getElementById('bakong-qr-img').classList.remove('hidden');
             document.getElementById('bakong-qr-loader').classList.add('hidden');
-            document.getElementById('bakong-merchant-name').textContent = data.merchant_name || 'SENGTREE bUN';
-            document.getElementById('bakong-account-id').textContent = data.account_id || 'bun_sengtri@bkrt';
             
             if (data.currency === 'KHR') {
                 document.getElementById('bakong-currency-symbol').textContent = '៛';
